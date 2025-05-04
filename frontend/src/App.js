@@ -2,9 +2,11 @@
 import React, { useEffect, useState } from 'react';
 
 import TotalActions from './components/TotalActions';
-import ActionByDate from './components/ActionByDate';
+//import ActionByDate from './components/ActionByDate';
 import UserListPanel from './components/UserListPanel';
-import ActivtyGraph from './components/ActivityGraph';
+import ActivityGraph from './components/ActivityGraph';
+//import ActionByUser from './components/ActionByUser';
+import ActionButton from './components/ActionButton';
 import './App.css';
 
 function App() {
@@ -30,7 +32,10 @@ function App() {
       <main className="main-content">
         <h1 className="dashboard-title">User Analytics Dashboard</h1>
         <TotalActions refreshTrigger={refreshTrigger} />
-        <ActivtyGraph selectUser={selectUser} />
+        <ActivityGraph selectUser={selectUser} />
+        <ActionButton actionName="login" label="Login" userId={selectUser || 'user_456'} onActionSent={handleRefresh} />
+        <ActionButton actionName="purchase" label="Purchase" userId={selectUser || 'user_456'} onActionSent={handleRefresh} />
+        <ActionButton actionName="signup" label="Signup" userId={selectUser || 'user_456'} onActionSent={handleRefresh} />
       </main>
     </div >
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 
-function ActionByUser(refreshTrigger) {
+function ActionByUser({ refreshTrigger }) {
     const [userCounts, setUserCounts] = useState({});
 
     useEffect(() => {
