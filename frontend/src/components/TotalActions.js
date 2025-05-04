@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function TotalActions(refreshTrigger) {
+function TotalActions({ refreshTrigger }) {
     const [totalActions, setTotalActions] = useState(null);
 
     useEffect(() => {

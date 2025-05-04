@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 
 
-function ActionByDate(refreshTrigger) {
+function ActionByDate({ refreshTrigger }) {
     const [dateCounts, setDateCounts] = useState({});
 
     useEffect(() => {
