@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AnalyticsFinal"
 include ':app'
+include ':analyticstracker'
