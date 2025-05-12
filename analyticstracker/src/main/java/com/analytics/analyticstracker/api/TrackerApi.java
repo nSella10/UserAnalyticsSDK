@@ -1,4 +1,6 @@
-package com.analytics.analyticstracker;
+package com.analytics.analyticstracker.api;
+
+import com.analytics.analyticstracker.model.ActionEvent;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
