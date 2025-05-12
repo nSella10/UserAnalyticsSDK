@@ -4,7 +4,6 @@ import android.os.Bundle;
 import com.analytics.analyticstracker.AnalyticsTracker;
 
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.HashMap;

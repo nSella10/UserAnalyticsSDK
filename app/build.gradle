@@ -39,4 +39,10 @@ dependencies {
     androidTestImplementation libs.espresso.core
 
     implementation project(":analyticstracker")
+
+    // Retrofit
+    implementation libs.retrofit
+
+// ממיר JSON באמצעות Gson
+    implementation libs.converter.gson
 }

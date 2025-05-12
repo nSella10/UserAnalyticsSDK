@@ -1,4 +1,4 @@
-package com.analytics.analyticstracker;
+package com.analytics.analyticstracker.model;
 
 import java.util.Map;
 
