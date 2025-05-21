@@ -7,6 +7,7 @@ public class User {
     public enum Gender {
         MALE, FEMALE, OTHER
     }
+    private String id;
     private String firstName;
     private String lastName;
     private String email;
@@ -15,7 +16,8 @@ public class User {
     private Gender gender;
 
     // Constructor (send data to backend)
-    public User(String firstName, String lastName,int age, Gender gender,String email, String password) {
+    public User(String id,String firstName, String lastName,int age, Gender gender,String email, String password) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
@@ -26,6 +28,14 @@ public class User {
 
     //getter & setter
 
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getFirstName() {
         return firstName;

@@ -2,14 +2,18 @@ package com.analytics.analyticsfinal.pages;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.analytics.analyticsfinal.MainActivity;
 import com.analytics.analyticsfinal.R;
+import com.analytics.analyticsfinal.utils.UserManager;
+import com.analytics.analyticstracker.model.AuthResponse;
+import com.analytics.analyticstracker.model.LoginRequest;
+import com.analytics.analyticsfinal.utils.TokenManager;
 import com.analytics.analyticstracker.AnalyticsTracker;
 import com.analytics.analyticstracker.model.User;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -93,26 +97,46 @@ public class AuthActivity extends AppCompatActivity {
                 return;
             }
 
-            AnalyticsTracker.loginUser(email, password, new Callback<User>() {
+            LoginRequest request = new LoginRequest(email, password);
+
+            AnalyticsTracker.loginUser(request, new Callback<AuthResponse>() {
                 @Override
-                public void onResponse(Call<User> call, Response<User> response) {
+                public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        showToast("Welcome " + response.body().getFirstName());
+                        // ✅ התחברות מוצלחת
+                        String token = response.body().getToken();
+                        TokenManager.saveToken(AuthActivity.this, token);
+
+                        String userId = response.body().getUser().getId();
+                        UserManager.saveUserId(AuthActivity.this, userId);
+
+                        showToast("Welcome " + response.body().getUser().getFirstName());
                         goToMainActivity();
-                    } else if (response.code() == 401) {
-                        showToast("Incorrect password.");
+
                     } else {
-                        showToast("Login failed: " + response.code());
+                        // ❌ טיפול בשגיאות לפי קוד תגובה
+                        switch (response.code()) {
+                            case 404:
+                                showToast("User not found. Please check your email.");
+                                break;
+                            case 401:
+                                showToast("Incorrect password. Please try again.");
+                                break;
+                            default:
+                                showToast("Login failed: " + response.code());
+                                break;
+                        }
                     }
                 }
 
                 @Override
-                public void onFailure(Call<User> call, Throwable t) {
+                public void onFailure(Call<AuthResponse> call, Throwable t) {
                     showToast("Network error: " + t.getMessage());
                 }
             });
         });
     }
+
 
     private void setupSignupLogic() {
         signupButton.setOnClickListener(v -> {
@@ -147,7 +171,7 @@ public class AuthActivity extends AppCompatActivity {
             }
 
             User.Gender gender = User.Gender.valueOf(signupGender.getSelectedItem().toString());
-            User user = new User(first, last, age, gender, email, password);
+            User user = new User(null,first, last, age, gender, email, password);
 
             AnalyticsTracker.signupUser(user, new Callback<Void>() {
                 @Override
@@ -189,5 +213,13 @@ public class AuthActivity extends AppCompatActivity {
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
+
+    private void saveToken(String token) {
+        getSharedPreferences("auth", MODE_PRIVATE)
+                .edit()
+                .putString("jwt_token", token)
+                .apply();
+    }
+    
 }
 
