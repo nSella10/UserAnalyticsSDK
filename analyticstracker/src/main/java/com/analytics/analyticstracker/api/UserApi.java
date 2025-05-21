@@ -1,6 +1,8 @@
 package com.analytics.analyticstracker.api;
 
+import com.analytics.analyticstracker.model.LoginRequest;
 import com.analytics.analyticstracker.model.User;
+import com.analytics.analyticstracker.model.AuthResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -12,7 +14,9 @@ public interface UserApi {
     @POST("users/register")
     Call<Void> registerUser(@Body User user);
 
-    @GET("users/login")
-    Call<User> loginUser(@Query("email")String email, @Query("password") String password);
+    @POST("users/login")
+    Call<AuthResponse> loginUser(@Body LoginRequest request);
+
+
 
 }
