@@ -3,7 +3,7 @@ package com.analytics.user_analytics;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.analytics")
 public class UserAnalyticsApplication {
 
 	public static void main(String[] args) {

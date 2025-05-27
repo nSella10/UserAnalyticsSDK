@@ -12,12 +12,7 @@ function ActivityGraph({ selectUser }) {
             ? `http://localhost:8080/track/stats/by-user/by-date?userId=${selectUser}`
             : `http://localhost:8080/track/stats/by-date`;
 
-        // const baseUrl = "http://localhost:8080/track/stats/by-user";
-        // let url = `${baseUrl}/by-date`;
 
-        // if (selectUser) {
-        //     url += `?userId=${selectUser}`;
-        // }
 
         fetch(url)
             .then(res => res.json())

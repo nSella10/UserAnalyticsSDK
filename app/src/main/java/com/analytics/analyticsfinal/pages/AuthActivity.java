@@ -36,6 +36,11 @@ public class AuthActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String token = TokenManager.getToken(this);
+        if (token != null && !token.isEmpty()) {
+            goToMainActivity();
+            return;
+        }
         setContentView(R.layout.activity_auth);
 
         initViews();
@@ -107,10 +112,17 @@ public class AuthActivity extends AppCompatActivity {
                         String token = response.body().getToken();
                         TokenManager.saveToken(AuthActivity.this, token);
 
-                        String userId = response.body().getUser().getId();
-                        UserManager.saveUserId(AuthActivity.this, userId);
+                        User user = response.body().getUser();
 
-                        showToast("Welcome " + response.body().getUser().getFirstName());
+                        // ✅ שמירת פרטי המשתמש
+                        UserManager.saveUserId(AuthActivity.this, user.getId());
+                        UserManager.setFirstName(AuthActivity.this, user.getFirstName());
+                        UserManager.setLastName(AuthActivity.this, user.getLastName());
+                        UserManager.setEmail(AuthActivity.this, user.getEmail());
+                        UserManager.setAge(AuthActivity.this, user.getAge());
+                        UserManager.setGender(AuthActivity.this, user.getGender().toString());
+
+                        showToast("Welcome " + user.getFirstName() +" "+ user.getLastName());
                         goToMainActivity();
 
                     } else {

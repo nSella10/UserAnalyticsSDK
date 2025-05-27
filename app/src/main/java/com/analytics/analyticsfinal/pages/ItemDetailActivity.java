@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.analytics.analyticsfinal.R;
 import com.analytics.analyticsfinal.model.ItemDetail;
 import com.analytics.analyticsfinal.adapter.ItemDetailAdapter;
+import com.analytics.analyticsfinal.utils.UserManager;
+import com.analytics.analyticstracker.AnalyticsTracker;
 
 import java.util.*;
 
@@ -31,6 +33,20 @@ public class ItemDetailActivity extends AppCompatActivity {
         List<ItemDetail> items = loadItems(category, subcategory);
         itemRecycler.setAdapter(new ItemDetailAdapter(this, items,category,subcategory
         ));
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AnalyticsTracker.startScreen("ItemDetailActivity");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        String userId = UserManager.getUserId(this);
+        if (userId != null) {
+            AnalyticsTracker.endScreen(userId);
+        }
     }
 
     private List<ItemDetail> loadItems(String category, String subcategory) {

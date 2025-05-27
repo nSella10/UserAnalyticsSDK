@@ -11,6 +11,7 @@ import com.analytics.user_analytics.dto.LoginRequest;
 import com.analytics.user_analytics.model.User;
 import com.analytics.user_analytics.repository.UserRepository;
 import com.analytics.user_analytics.security.JwtUtil;
+import com.analytics.user_analytics.dto.UpdateNameRequest;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -68,6 +69,26 @@ public class UserController {
         return ResponseEntity.ok(new AuthResponse(token, user));
     }
 
+
+    @PostMapping("/update-name")
+    public ResponseEntity<?> updateUserName(@RequestBody UpdateNameRequest request) {
+        System.out.println("📩 הגיעו נתונים לעדכון: " + request.getUserId());
+        try {
+            User user = userRepository.findById(request.getUserId()).orElse(null);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
+            userRepository.save(user);
+
+            return ResponseEntity.ok("User name updated successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed");
+        }
+    }
 
 
 
