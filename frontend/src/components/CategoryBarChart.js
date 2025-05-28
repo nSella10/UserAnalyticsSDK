@@ -6,10 +6,9 @@ import {
   ResponsiveContainer, CartesianGrid
 } from 'recharts';
 
-const CategoryBarChart = ({ selectedUsers }) => {
+const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory }) => {
   const [data, setData] = useState([]);
   const [viewMode, setViewMode] = useState('category');
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
   const [usersMap, setUsersMap] = useState({});
 
