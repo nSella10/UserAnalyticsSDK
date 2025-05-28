@@ -3,14 +3,17 @@ import React, { useState } from 'react';
 import ActivityGraph from './components/ActivityGraph';
 import UserListPanel from './components/UserListPanel';
 import UserClickLog from './components/UserClickLog';
-import CategoryPieChart from './components/CategoryPieChart';
 import CategoryBarChart from './components/CategoryBarChart'; 
+import MultiPieCharts from './components/MultiPieCharts';
+
 
 import './App.css';
 
 function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+
 
   const handleRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -34,10 +37,20 @@ function App() {
         <h1 className="dashboard-title">User Analytics Dashboard</h1>
 
         {/* גרף חדש שמציג לחיצות לפי קטגוריה ויוזר (Stacked Bar) */}
-        <CategoryBarChart selectedUsers={selectedUsers} />
+        <CategoryBarChart
+          selectedUsers={selectedUsers}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        
+        />
 
+        
         {/* Pie Chart רגיל לפי קטגוריה */}
-        <CategoryPieChart selectedUsers={selectedUsers} />
+        <MultiPieCharts
+          selectedUsers={selectedUsers}
+          selectedCategory={selectedCategory}
+        />
+        
 
         {/* גרף פעילות לפי זמן */}
         <section className="dashboard-section">
