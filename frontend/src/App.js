@@ -52,11 +52,7 @@ function App() {
         />
         
 
-        {/* גרף פעילות לפי זמן */}
-        <section className="dashboard-section">
-          <ActivityGraph selectedUsers={selectedUsers} />
-        </section>
-
+    
         {/* טבלת לחיצות של יוזרים נבחרים */}
         {isUserFilterActive && (
           <section className="dashboard-section">

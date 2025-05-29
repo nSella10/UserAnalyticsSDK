@@ -1,70 +1,23 @@
-// // components/CategoryPieChart.js
-// import React, { useEffect, useState } from 'react';
-// import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-// const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#bb6bd9', '#f44336', '#4caf50', '#e91e63'];
-
-// function CategoryPieChart() {
-//     const [data, setData] = useState([]);
-
-//     useEffect(() => {
-//         fetch('http://localhost:8080/track/stats/by-category')
-//             .then(res => res.json())
-//             .then(json => {
-//                 const formatted = Object.entries(json).map(([category, count]) => ({
-//                     name: category,
-//                     value: count
-//                 }));
-//                 setData(formatted);
-//             })
-//             .catch(console.error);
-//     }, []);
-
-//     return (
-//         <div style={{ marginTop: 40 }}>
-//             <h2>Category Distribution</h2>
-//             <ResponsiveContainer width="100%" height={300}>
-//                 <PieChart>
-//                     <Pie
-//                         data={data}
-//                         cx="50%"
-//                         cy="50%"
-//                         labelLine={false}
-//                         label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-//                         outerRadius={120}
-//                         fill="#8884d8"
-//                         dataKey="value"
-//                     >
-//                         {data.map((_, index) => (
-//                             <Cell key={index} fill={COLORS[index % COLORS.length]} />
-//                         ))}
-//                     </Pie>
-//                     <Tooltip />
-//                     <Legend />
-//                 </PieChart>
-//             </ResponsiveContainer>
-//         </div>
-//     );
-// }
-
-// export default CategoryPieChart;
-
-
-// components/CategoryPieChart.js
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import TimeRangeFilter from './TimeRangeFilter';
+import TimeRangeUtils from '../utils/TimeRangeUtils';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#bb6bd9', '#f44336', '#4caf50', '#e91e63'];
 
 function CategoryPieChart({ selectedUsers }) {
     const [data, setData] = useState([]);
     const [total, setTotal] = useState(0);
+    const [timeRange, setTimeRange] = useState('all'); // 'all', 'day', 'week', 'month'
 
     useEffect(() => {
         const params = new URLSearchParams();
         if (selectedUsers && selectedUsers.length > 0) {
             selectedUsers.forEach(id => params.append('userIds', id));
         }
+
+        // הוספת פרמטרים של טווח זמן
+        TimeRangeUtils.addTimeRangeToParams(params, timeRange);
 
         fetch(`http://localhost:8080/track/stats/by-category?${params}`)
             .then(res => res.json())
@@ -80,7 +33,7 @@ function CategoryPieChart({ selectedUsers }) {
                 setData(formatted);
             })
             .catch(console.error);
-    }, [selectedUsers]);
+    }, [selectedUsers, timeRange]);
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
@@ -129,7 +82,13 @@ function CategoryPieChart({ selectedUsers }) {
 
     return (
         <div style={{ marginTop: 40 }}>
-            <h2>התפלגות פעולות לפי קטגוריה</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                <h2>התפלגות פעולות לפי קטגוריה</h2>
+
+                {/* רכיב סינון לפי זמן */}
+                <TimeRangeFilter timeRange={timeRange} setTimeRange={setTimeRange} />
+            </div>
+
             {data.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
                     אין נתונים להצגה
@@ -138,6 +97,11 @@ function CategoryPieChart({ selectedUsers }) {
                 <div>
                     <div style={{ textAlign: 'center', marginBottom: '10px' }}>
                         <span style={{ fontWeight: 'bold' }}>סה"כ פעולות: {total}</span>
+                        {timeRange !== 'all' && (
+                            <span style={{ marginRight: '10px', fontSize: '14px', color: '#666' }}>
+                                ({TimeRangeUtils.getTimeRangeDescription(timeRange)})
+                            </span>
+                        )}
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
