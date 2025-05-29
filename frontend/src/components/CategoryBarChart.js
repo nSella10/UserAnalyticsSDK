@@ -1,16 +1,17 @@
-
-
 import React, { useEffect, useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts';
+import TimeRangeFilter from './TimeRangeFilter';
+import TimeRangeUtils from '../utils/TimeRangeUtils';
 
 const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory }) => {
   const [data, setData] = useState([]);
   const [viewMode, setViewMode] = useState('category');
   const [categories, setCategories] = useState([]);
   const [usersMap, setUsersMap] = useState({});
+  const [timeRange, setTimeRange] = useState('all'); // 'all', 'day', 'week', 'month'
 
   useEffect(() => {
     fetch("http://localhost:8080/track/stats/all-users")
@@ -26,7 +27,10 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
 
   useEffect(() => {
     if (viewMode !== 'category') {
-      fetch("http://localhost:8080/track/stats/by-category")
+      const params = new URLSearchParams();
+      TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+
+      fetch(`http://localhost:8080/track/stats/by-category?${params}`)
         .then(res => res.json())
         .then(data => {
           const options = Object.keys(data);
@@ -36,7 +40,7 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
           }
         });
     }
-  }, [viewMode]);
+  }, [viewMode, timeRange]);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -45,7 +49,9 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
       params.append('category', selectedCategory);
     }
 
-   
+    // הוספת פרמטרים של טווח זמן
+    TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+
     const endpoint = viewMode === 'category'
       ? 'by-category-stacked'
       : viewMode === 'subcategory'
@@ -80,7 +86,7 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
 
         setData(formatted);
       });
-  }, [viewMode, selectedUsers, selectedCategory]);
+  }, [viewMode, selectedUsers, selectedCategory, timeRange]);
 
   const userIds = selectedUsers.length > 0
     ? selectedUsers
@@ -91,7 +97,6 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
     const entry = payload[0]?.payload;
     const total = entry.total || 0;
 
-  
     return (
       <div style={{ background: 'white', border: '1px solid #ccc', padding: '10px', borderRadius: '6px' }}>
         <strong>📂 {label}</strong><br />
@@ -118,11 +123,23 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
 
   return (
     <div style={{ marginTop: '30px' }}>
-      <h2>📊 Click Distribution by {viewMode.charAt(0).toUpperCase() + viewMode.slice(1)}</h2>
-      <div style={{ marginBottom: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+        <h2>📊 Click Distribution by {viewMode.charAt(0).toUpperCase() + viewMode.slice(1)}</h2>
+
+        {/* רכיב סינון לפי זמן */}
+        <TimeRangeFilter timeRange={timeRange} setTimeRange={setTimeRange} />
+      </div>
+
+      <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
         <button onClick={() => setViewMode('category')} style={{ marginRight: 8 }}>By Category</button>
         <button onClick={() => setViewMode('subcategory')} style={{ marginRight: 8 }}>By Subcategory</button>
-        <button onClick={() => setViewMode('item')}>By Item</button>
+        <button onClick={() => setViewMode('item')} style={{ marginRight: 15 }}>By Item</button>
+
+        {timeRange !== 'all' && (
+          <span style={{ fontSize: '14px', color: '#666' }}>
+            מציג נתונים ל{TimeRangeUtils.getTimeRangeDescription(timeRange)}
+          </span>
+        )}
       </div>
 
       {(viewMode !== 'category') && (
@@ -161,5 +178,6 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
       )}
     </div>
   );
-}  
+}
+
 export default CategoryBarChart;

@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setTitle("My Interests");
 
         // Initialize the AnalyticsTracker with the server URL
-        AnalyticsTracker.init("http://192.168.7.7:8080/");
+        AnalyticsTracker.init("https://7782-62-219-65-138.ngrok-free.app");
 
 
 

@@ -133,7 +133,7 @@ import retrofit2.Response;
 
 public class AnalyticsTracker {
 
-    private static String BASE_URL = "http://192.168.7.7:8080/"; // Default base URL
+    private static String BASE_URL = "https://7782-62-219-65-138.ngrok-free.app"; // Default base URL
 
     private static String currentScreen = null;
     private static long screenEnterTime = 0;

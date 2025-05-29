@@ -105,7 +105,7 @@ public class UserActionController {
                                                 Collectors.counting()));
         }
 
-      
+
 
         @GetMapping("/stats/by-subcategory")
         public Object getClicksBySubcategory(
@@ -151,11 +151,12 @@ public class UserActionController {
                                 })
                                 .collect(Collectors.toList());
         }
-        
-    
+
+
         @GetMapping("/stats/by-item")
         public Object getClicksByItem(
                         @RequestParam String category,
+                        @RequestParam(required = false) String subcategory,
                         @RequestParam(required = false) String fromDate,
                         @RequestParam(required = false) String toDate,
                         @RequestParam(required = false) List<String> userIds) {
@@ -168,6 +169,7 @@ public class UserActionController {
                                         .filter(action -> "click_item".equals(action.getActionName()) &&
                                                         action.getProperties() != null &&
                                                         category.equals(action.getProperties().get("category")) &&
+                                                        (subcategory == null || subcategory.equals(action.getProperties().get("subcategory"))) &&
                                                         action.getProperties().containsKey("item") &&
                                                         isInDateRange(action.getTimestamp(), fromDate, toDate))
                                         .collect(Collectors.groupingBy(
@@ -180,6 +182,7 @@ public class UserActionController {
                                 .filter(action -> "click_item".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 category.equals(action.getProperties().get("category")) &&
+                                                (subcategory == null || subcategory.equals(action.getProperties().get("subcategory"))) &&
                                                 action.getProperties().containsKey("item") &&
                                                 isInDateRange(action.getTimestamp(), fromDate, toDate) &&
                                                 userIds.contains(action.getUserId()))
@@ -196,7 +199,7 @@ public class UserActionController {
                                 })
                                 .collect(Collectors.toList());
         }
-        
+
         private boolean isInDateRange(LocalDateTime timestamp, String fromDate, String toDate) {
                 if (fromDate == null || toDate == null)
                         return true;
