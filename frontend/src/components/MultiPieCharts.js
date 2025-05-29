@@ -1,16 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#bb6bd9', '#f44336', '#4caf50', '#e91e63'];
+const COLORS = [
+    '#3B82F6', '#8B5CF6', '#10B981', '#F59E0B',
+    '#EF4444', '#06B6D4', '#84CC16', '#F97316'
+];
 
-// רכיב אינדיקטור טעינה
+// Loading Indicator Component
 const LoadingIndicator = () => (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px' }}>
-        <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '24px', marginBottom: '10px' }}>⏳</div>
-            <div>טוען נתונים...</div>
+    <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+            <div className="relative">
+                <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mb-4 mx-auto"></div>
+                <div className="absolute inset-0 w-12 h-12 border-4 border-purple-200 border-b-purple-500 rounded-full animate-spin mb-4 mx-auto" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+            </div>
+            <div className="text-gray-600 font-medium animate-pulse">Loading data...</div>
+            <div className="mt-2 flex justify-center space-x-1">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
         </div>
     </div>
 );
@@ -244,7 +255,7 @@ function MultiPieCharts({ selectedUsers }) {
         );
     };
 
-    // רכיב טולטיפ מותאם אישית
+    // Custom Tooltip Component
     const CustomTooltip = ({ active, payload, chartType }) => {
         if (active && payload && payload.length) {
             const item = payload[0];
@@ -252,48 +263,60 @@ function MultiPieCharts({ selectedUsers }) {
             const percentage = ((item.value / total) * 100).toFixed(1);
 
             return (
-                <div style={{
-                    backgroundColor: '#fff',
-                    padding: '10px',
-                    border: '1px solid #ccc',
-                    borderRadius: '5px'
-                }}>
-                    <p style={{ fontWeight: 'bold', color: item.color }}>
-                        {item.name}
-                    </p>
-                    <p>
-                        {item.value} פעולות ({percentage}%)
-                    </p>
+                <div className="bg-white/95 backdrop-blur-sm p-4 border border-gray-200 rounded-xl shadow-xl animate-fade-in">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div
+                            className="w-4 h-4 rounded-full shadow-sm"
+                            style={{ backgroundColor: item.color }}
+                        ></div>
+                        <p className="font-bold text-gray-800 text-sm">
+                            {item.name}
+                        </p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-sm text-gray-600 flex justify-between">
+                            <span>Actions:</span>
+                            <span className="font-semibold text-gray-800">{item.value.toLocaleString()}</span>
+                        </p>
+                        <p className="text-sm text-gray-600 flex justify-between">
+                            <span>Percentage:</span>
+                            <span className="font-semibold" style={{ color: item.color }}>{percentage}%</span>
+                        </p>
+                    </div>
+                    <div className="mt-2 h-1 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{
+                                backgroundColor: item.color,
+                                width: `${percentage}%`
+                            }}
+                        ></div>
+                    </div>
                 </div>
             );
         }
         return null;
     };
 
-    // רכיב מקרא מותאם אישית
+    // Custom Legend Component
     const CustomLegend = ({ payload, chartType }) => {
         if (!payload) return null;
 
         return (
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '12px', maxHeight: '200px', overflowY: 'auto' }}>
+            <ul className="list-none p-0 m-0 text-xs max-h-48 overflow-y-auto custom-scrollbar space-y-1">
                 {payload.map((entry, index) => {
                     const percentage = ((entry.payload.value / totals[chartType]) * 100).toFixed(1);
+                    const isSelected =
+                        (chartType === 'category' && entry.payload.name === selectedCategory) ||
+                        (chartType === 'subcategory' && entry.payload.name === selectedSubcategory);
 
                     return (
                         <li
                             key={`item-${index}`}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                marginBottom: '5px',
-                                cursor: chartType === 'category' || chartType === 'subcategory' ? 'pointer' : 'default',
-                                padding: '3px',
-                                borderRadius: '3px',
-                                backgroundColor:
-                                    (chartType === 'category' && entry.payload.name === selectedCategory) ||
-                                        (chartType === 'subcategory' && entry.payload.name === selectedSubcategory)
-                                        ? 'rgba(0,0,0,0.05)' : 'transparent'
-                            }}
+                            className={`flex items-center p-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${chartType === 'category' || chartType === 'subcategory'
+                                ? 'cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:shadow-md hover:transform hover:scale-[1.02]'
+                                : 'cursor-default'
+                                } ${isSelected ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 shadow-md transform scale-[1.02]' : 'bg-white/50 border border-gray-200 hover:border-blue-300'}`}
                             onClick={() => {
                                 if (chartType === 'category') {
                                     setSelectedCategory(entry.payload.name);
@@ -303,19 +326,43 @@ function MultiPieCharts({ selectedUsers }) {
                                 }
                             }}
                         >
-                            <span
-                                style={{
-                                    display: 'inline-block',
-                                    width: '10px',
-                                    height: '10px',
-                                    backgroundColor: entry.color,
-                                    marginRight: '5px'
-                                }}
+                            {/* Animated background effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 to-purple-400/10 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
+
+                            <div
+                                className="w-4 h-4 rounded-full mr-3 shadow-md relative z-10 ring-2 ring-white"
+                                style={{ backgroundColor: entry.color }}
                             />
-                            <span style={{ flex: 1 }}>{entry.payload.name}</span>
-                            <span style={{ marginLeft: '5px', color: '#666' }}>
-                                {entry.payload.value} ({percentage}%)
-                            </span>
+                            <div className="flex-1 min-w-0 relative z-10">
+                                <div className="font-semibold text-gray-700 truncate text-sm">
+                                    {entry.payload.name}
+                                </div>
+                                <div className="text-xs text-gray-500 mt-0.5">
+                                    {entry.payload.value.toLocaleString()} actions
+                                </div>
+                            </div>
+                            <div className="ml-3 text-right relative z-10">
+                                <div className="font-bold text-sm" style={{ color: entry.color }}>
+                                    {percentage}%
+                                </div>
+                                {isSelected && (
+                                    <div className="w-5 h-5 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mt-1 animate-bounce-subtle">
+                                        ✓
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Progress bar */}
+                            <div className="absolute bottom-0 left-0 h-1 bg-gray-200 w-full">
+                                <div
+                                    className="h-full transition-all duration-500 ease-out"
+                                    style={{
+                                        backgroundColor: entry.color,
+                                        width: `${percentage}%`,
+                                        opacity: isSelected ? 1 : 0.6
+                                    }}
+                                ></div>
+                            </div>
                         </li>
                     );
                 })}
@@ -324,223 +371,245 @@ function MultiPieCharts({ selectedUsers }) {
     };
 
     return (
-        <div style={{ marginTop: 40 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                <h2>ניתוח מדורג לפי קטגוריה, תת-קטגוריה ופריט</h2>
-
-                {/* רכיב סינון לפי זמן */}
-                <TimeRangeFilter timeRange={timeRange} setTimeRange={setTimeRange} />
+        <div className="space-y-6">
+            {/* Header with Time Filter */}
+            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6 mb-8">
+                <div className="text-center lg:text-left">
+                    <div className="flex items-center gap-3 justify-center lg:justify-start mb-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
+                            🔍
+                        </div>
+                        <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                            Hierarchical Analysis
+                        </h2>
+                    </div>
+                    <p className="text-gray-600 text-base max-w-md mx-auto lg:mx-0">
+                        Navigate through categories, subcategories, and items with interactive pie charts
+                    </p>
+                    <div className="w-16 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto lg:mx-0 mt-3"></div>
+                </div>
+                <div className="flex-shrink-0">
+                    <TimeRangeFilter timeRange={timeRange} setTimeRange={setTimeRange} />
+                </div>
             </div>
 
-            <div className="multi-pie-container" style={{ display: 'flex', gap: '20px', flexWrap: 'nowrap', justifyContent: 'space-between' }}>
-                {/* תצוגת קטגוריות */}
-                <div className="pie-section" style={{ flex: '1 1 30%', minWidth: '300px', border: '1px solid #eee', borderRadius: '8px', padding: '15px' }}>
-                    <h3>קטגוריות</h3>
-                    {loading.category ? (
-                        <LoadingIndicator />
-                    ) : categoryData.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
-                            אין נתונים להצגה
-                        </div>
-                    ) : (
-                        <div>
-                            <div style={{
-                                textAlign: 'center',
-                                marginBottom: '10px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <span style={{ fontWeight: 'bold' }}>סה"כ: {totals.category} פעולות</span>
-                                {timeRange !== 'all' && (
-                                    <span style={{ marginRight: '10px', fontSize: '14px', color: '#666' }}>
-                                        ({TimeRangeUtils.getTimeRangeDescription(timeRange)})
-                                    </span>
-                                )}
-                            </div>
-                            <ResponsiveContainer width="100%" height={250}>
-                                <PieChart>
-                                    <Pie
-                                        data={categoryData}
-                                        cx="50%"
-                                        cy="50%"
-                                        labelLine={false}
-                                        label={renderCustomizedLabel}
-                                        outerRadius={80}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        animationDuration={800}
-                                        onClick={(data) => {
-                                            setSelectedCategory(data.name);
-                                            setSelectedSubcategory(null);
-                                        }}
-                                    >
-                                        {categoryData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={COLORS[index % COLORS.length]}
-                                                stroke={entry.name === selectedCategory ? '#000' : 'none'}
-                                                strokeWidth={entry.name === selectedCategory ? 2 : 0}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip chartType="category" />} />
-                                    <Legend
-                                        content={<CustomLegend chartType="category" />}
-                                        layout="vertical"
-                                        verticalAlign="middle"
-                                        align="right"
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                    )}
-                </div>
+            {/* Charts Container */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Categories Chart */}
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden">
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                {/* תצוגת תת-קטגוריות */}
-                <div className="pie-section" style={{ flex: '1 1 30%', minWidth: '300px', border: '1px solid #eee', borderRadius: '8px', padding: '15px' }}>
-                    <h3>תתי-קטגוריות</h3>
-                    {loading.subcategory ? (
-                        <LoadingIndicator />
-                    ) : !selectedCategory ? (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '20px',
-                            color: 'gray',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            height: '250px'
-                        }}>
-                            <div style={{ fontSize: '24px', marginBottom: '10px' }}>👈</div>
-                            <div>בחר קטגוריה כדי להציג תת-קטגוריות</div>
-                        </div>
-                    ) : subcategoryData.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
-                            אין תת-קטגוריות עבור {selectedCategory}
-                        </div>
-                    ) : (
-                        <div>
-                            <div style={{
-                                textAlign: 'center',
-                                marginBottom: '10px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <span style={{ fontWeight: 'bold' }}>סה"כ: {totals.subcategory} פעולות</span>
-                                {timeRange !== 'all' && (
-                                    <span style={{ marginRight: '10px', fontSize: '14px', color: '#666' }}>
-                                        ({TimeRangeUtils.getTimeRangeDescription(timeRange)})
-                                    </span>
-                                )}
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-sm shadow-lg">
+                                📊
                             </div>
-                            <ResponsiveContainer width="100%" height={250}>
-                                <PieChart>
-                                    <Pie
-                                        data={subcategoryData}
-                                        cx="50%"
-                                        cy="50%"
-                                        labelLine={false}
-                                        label={renderCustomizedLabel}
-                                        outerRadius={80}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        animationDuration={800}
-                                        onClick={(data) => {
-                                            setSelectedSubcategory(data.name);
-                                        }}
-                                    >
-                                        {subcategoryData.map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={COLORS[index % COLORS.length]}
-                                                stroke={entry.name === selectedSubcategory ? '#000' : 'none'}
-                                                strokeWidth={entry.name === selectedSubcategory ? 2 : 0}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip chartType="subcategory" />} />
-                                    <Legend
-                                        content={<CustomLegend chartType="subcategory" />}
-                                        layout="vertical"
-                                        verticalAlign="middle"
-                                        align="right"
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                            <h3 className="text-xl font-bold text-gray-800">Categories</h3>
+                            <div className="flex-1"></div>
+                            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
                         </div>
-                    )}
-                </div>
+                    </div>
 
-                {/* תצוגת פריטים */}
-                <div className="pie-section" style={{ flex: '1 1 30%', minWidth: '300px', border: '1px solid #eee', borderRadius: '8px', padding: '15px' }}>
-                    <h3>פריטים</h3>
-                    {loading.item ? (
-                        <LoadingIndicator />
-                    ) : !selectedCategory || !selectedSubcategory ? (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '20px',
-                            color: 'gray',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            height: '250px'
-                        }}>
-                            <div style={{ fontSize: '24px', marginBottom: '10px' }}>👈</div>
-                            <div>בחר קטגוריה ותת-קטגוריה כדי להציג פריטים</div>
-                        </div>
-                    ) : itemData.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '20px', color: 'gray' }}>
-                            אין פריטים עבור {selectedSubcategory}
-                        </div>
-                    ) : (
-                        <div>
-                            <div style={{
-                                textAlign: 'center',
-                                marginBottom: '10px',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <span style={{ fontWeight: 'bold' }}>סה"כ: {totals.item} פעולות</span>
-                                {timeRange !== 'all' && (
-                                    <span style={{ marginRight: '10px', fontSize: '14px', color: '#666' }}>
-                                        ({TimeRangeUtils.getTimeRangeDescription(timeRange)})
-                                    </span>
-                                )}
+                    <div className="relative z-10">
+                        {loading.category ? (
+                            <LoadingIndicator />
+                        ) : categoryData.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                    <span className="text-2xl opacity-50">📊</span>
+                                </div>
+                                <p className="text-sm font-medium text-gray-500">No data available</p>
+                                <p className="text-xs text-gray-400 mt-1">Try adjusting your filters</p>
                             </div>
-                            <ResponsiveContainer width="100%" height={250}>
-                                <PieChart>
-                                    <Pie
-                                        data={itemData}
-                                        cx="50%"
-                                        cy="50%"
-                                        labelLine={false}
-                                        label={renderCustomizedLabel}
-                                        outerRadius={80}
-                                        fill="#8884d8"
-                                        dataKey="value"
-                                        animationDuration={800}
-                                    >
-                                        {itemData.map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip chartType="item" />} />
-                                    <Legend
-                                        content={<CustomLegend chartType="item" />}
-                                        layout="vertical"
-                                        verticalAlign="middle"
-                                        align="right"
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                        ) : (
+                            <div>
+                                <div className="text-center mb-4">
+                                    <span className="font-bold text-gray-700">Total: {totals.category} actions</span>
+                                    {timeRange !== 'all' && (
+                                        <span className="ml-2 text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                            {TimeRangeUtils.getTimeRangeDescription(timeRange)}
+                                        </span>
+                                    )}
+                                </div>
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <PieChart>
+                                        <Pie
+                                            data={categoryData}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            label={renderCustomizedLabel}
+                                            outerRadius={80}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            animationDuration={800}
+                                            onClick={(data) => {
+                                                setSelectedCategory(data.name);
+                                                setSelectedSubcategory(null);
+                                            }}
+                                        >
+                                            {categoryData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={COLORS[index % COLORS.length]}
+                                                    stroke={entry.name === selectedCategory ? '#000' : 'none'}
+                                                    strokeWidth={entry.name === selectedCategory ? 2 : 0}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip chartType="category" />} />
+                                        <Legend
+                                            content={<CustomLegend chartType="category" />}
+                                            layout="vertical"
+                                            verticalAlign="middle"
+                                            align="right"
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Subcategories Chart */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xs">
+                                🏷️
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-800">Subcategories</h3>
+                            {selectedCategory && (
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                                    {selectedCategory}
+                                </span>
+                            )}
                         </div>
-                    )}
+
+                        {loading.subcategory ? (
+                            <LoadingIndicator />
+                        ) : !selectedCategory ? (
+                            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                                <span className="text-4xl mb-4 opacity-50">👈</span>
+                                <p className="text-sm font-medium text-center">Select a category to view subcategories</p>
+                            </div>
+                        ) : subcategoryData.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                                <span className="text-4xl mb-4 opacity-50">🏷️</span>
+                                <p className="text-sm font-medium">No subcategories for {selectedCategory}</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="text-center mb-4">
+                                    <span className="font-bold text-gray-700">Total: {totals.subcategory} actions</span>
+                                    {timeRange !== 'all' && (
+                                        <span className="ml-2 text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                            {TimeRangeUtils.getTimeRangeDescription(timeRange)}
+                                        </span>
+                                    )}
+                                </div>
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <PieChart>
+                                        <Pie
+                                            data={subcategoryData}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            label={renderCustomizedLabel}
+                                            outerRadius={80}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            animationDuration={800}
+                                            onClick={(data) => {
+                                                setSelectedSubcategory(data.name);
+                                            }}
+                                        >
+                                            {subcategoryData.map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={COLORS[index % COLORS.length]}
+                                                    stroke={entry.name === selectedSubcategory ? '#000' : 'none'}
+                                                    strokeWidth={entry.name === selectedSubcategory ? 2 : 0}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip chartType="subcategory" />} />
+                                        <Legend
+                                            content={<CustomLegend chartType="subcategory" />}
+                                            layout="vertical"
+                                            verticalAlign="middle"
+                                            align="right"
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Items Chart */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center text-white text-xs">
+                                📦
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-800">Items</h3>
+                            {selectedSubcategory && (
+                                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
+                                    {selectedSubcategory}
+                                </span>
+                            )}
+                        </div>
+
+                        {loading.item ? (
+                            <LoadingIndicator />
+                        ) : !selectedCategory || !selectedSubcategory ? (
+                            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                                <span className="text-4xl mb-4 opacity-50">👈</span>
+                                <p className="text-sm font-medium text-center">Select category and subcategory to view items</p>
+                            </div>
+                        ) : itemData.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                                <span className="text-4xl mb-4 opacity-50">📦</span>
+                                <p className="text-sm font-medium">No items for {selectedSubcategory}</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="text-center mb-4">
+                                    <span className="font-bold text-gray-700">Total: {totals.item} actions</span>
+                                    {timeRange !== 'all' && (
+                                        <span className="ml-2 text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                            {TimeRangeUtils.getTimeRangeDescription(timeRange)}
+                                        </span>
+                                    )}
+                                </div>
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <PieChart>
+                                        <Pie
+                                            data={itemData}
+                                            cx="50%"
+                                            cy="50%"
+                                            labelLine={false}
+                                            label={renderCustomizedLabel}
+                                            outerRadius={80}
+                                            fill="#8884d8"
+                                            dataKey="value"
+                                            animationDuration={800}
+                                        >
+                                            {itemData.map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip content={<CustomTooltip chartType="item" />} />
+                                        <Legend
+                                            content={<CustomLegend chartType="item" />}
+                                            layout="vertical"
+                                            verticalAlign="middle"
+                                            align="right"
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
