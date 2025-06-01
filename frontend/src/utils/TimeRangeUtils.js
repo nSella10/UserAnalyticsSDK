@@ -27,9 +27,17 @@ export default class TimeRangeUtils {
     }
 
     // פורמט התאריך בצורה שתואמת את הפורמט שהשרת מצפה לו
+    // שליחת זמן מקומי (ישראל) בפורמט ISO
+    console.log('🕐 Frontend sending dates:', {
+      fromDate: fromDate.toISOString(),
+      toDate: now.toISOString(),
+      fromDateLocal: fromDate.toLocaleString('he-IL'),
+      toDateLocal: now.toLocaleString('he-IL')
+    });
+
     return {
-      fromDate: fromDate.toISOString().split('.')[0],
-      toDate: now.toISOString().split('.')[0]
+      fromDate: fromDate.toISOString(),
+      toDate: now.toISOString()
     };
   }
 

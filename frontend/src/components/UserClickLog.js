@@ -47,11 +47,15 @@
 //
 //export default UserClickLog;
 import React, { useEffect, useState } from 'react';
+import TimeRangeFilter from './TimeRangeFilter';
+import TimeRangeUtils from '../utils/TimeRangeUtils';
 
 function UserClickLog({ userId }) {
     const [logs, setLogs] = useState([]);
     const [users, setUsers] = useState([]);
     const [userLabel, setUserLabel] = useState('');
+    const [screenSummary, setScreenSummary] = useState(null);
+    const [timeRange, setTimeRange] = useState('all');
 
     // שליפת המשתמשים
     useEffect(() => {
@@ -65,11 +69,28 @@ function UserClickLog({ userId }) {
     useEffect(() => {
         if (!userId) return;
 
+        // בניית URL עם פרמטרי זמן
+        const params = new URLSearchParams();
+        params.append('userId', userId);
+        TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+
         // טען לוגים
-        fetch(`http://localhost:8080/track/stats/logs?userId=${userId}`)
+        fetch(`http://localhost:8080/track/stats/logs?${params.toString()}`)
             .then(res => res.json())
-            .then(data => setLogs(data))
+            .then(data => {
+                console.log('Received logs:', data.length, 'items for timeRange:', timeRange);
+                setLogs(data);
+            })
             .catch(err => console.error("Error fetching logs:", err));
+
+        // טען סיכום זמני מסך
+        const summaryParams = new URLSearchParams();
+        TimeRangeUtils.addTimeRangeToParams(summaryParams, timeRange);
+
+        fetch(`http://localhost:8080/screen-time/user-screen-summary/${userId}?${summaryParams.toString()}`)
+            .then(res => res.json())
+            .then(data => setScreenSummary(data))
+            .catch(err => console.error("Error fetching screen summary:", err));
 
         // מצא את היוזר להצגה
         const user = users.find(u => u.id === userId);
@@ -78,20 +99,94 @@ function UserClickLog({ userId }) {
         } else {
             setUserLabel(userId); // fallback
         }
-    }, [userId, users]);
+    }, [userId, users, timeRange]);
+
+    const getCategoryIcon = (category) => {
+        switch (category) {
+            case 'ספורט':
+                return '⚽';
+            case 'טכנולוגיה':
+                return '💻';
+            case 'בידור':
+                return '🎬';
+            case 'חדשות':
+                return '📰';
+            case 'דף ראשי':
+                return '🏠';
+            default:
+                return '📂';
+        }
+    };
 
     return (
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-sm">
-                    📋
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-sm">
+                        📋
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-800">Activity Log</h2>
+                        <p className="text-sm text-gray-600">{userLabel}</p>
+                    </div>
                 </div>
-                <div>
-                    <h2 className="text-xl font-bold text-gray-800">Activity Log</h2>
-                    <p className="text-sm text-gray-600">{userLabel}</p>
+
+                {/* פילטר זמן */}
+                <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-700">טווח זמן:</label>
+                    <TimeRangeFilter
+                        timeRange={timeRange}
+                        setTimeRange={setTimeRange}
+                    />
                 </div>
             </div>
+
+            {/* Screen Time Summary */}
+            {screenSummary && screenSummary.categories && screenSummary.categories.length > 0 && (
+                <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        📊 סיכום זמני מסך לפי קטגוריות
+                    </h3>
+                    <div className="mb-3 flex flex-wrap gap-4 text-sm text-gray-600">
+                        <span>⏱️ סה"כ זמן: <strong>{screenSummary.totalTimeFormatted}</strong></span>
+                        <span>📱 סה"כ מסכים: <strong>{screenSummary.totalScreens}</strong></span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {screenSummary.categories.slice(0, 6).map((category, index) => (
+                            <div key={index} className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="font-medium text-gray-800 flex items-center gap-1 text-sm">
+                                        {getCategoryIcon(category.category)}
+                                        {category.category}
+                                    </span>
+                                    <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                                        {category.percentage}%
+                                    </span>
+                                </div>
+                                <div className="text-xs text-gray-600 space-y-1">
+                                    <div className="flex justify-between">
+                                        <span>זמן:</span>
+                                        <span className="font-medium text-blue-600">{category.durationFormatted}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span>ביקורים:</span>
+                                        <span className="font-medium">{category.visits}</span>
+                                    </div>
+                                </div>
+                                <div className="mt-2">
+                                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                        <div
+                                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-300"
+                                            style={{ width: `${category.percentage}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {logs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-gray-400">

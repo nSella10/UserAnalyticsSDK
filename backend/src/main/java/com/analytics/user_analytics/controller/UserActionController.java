@@ -79,12 +79,25 @@ public class UserActionController {
         }
 
         @GetMapping("/stats/logs")
-        public List<UserAction> getUserLogs(@RequestParam String userId) {
+        public List<UserAction> getUserLogs(
+                        @RequestParam String userId,
+                        @RequestParam(required = false) String fromDate,
+                        @RequestParam(required = false) String toDate) {
+
+                System.out.println("=== USER LOGS REQUEST ===");
+                System.out.println("userId: " + userId);
+                System.out.println("fromDate: " + fromDate);
+                System.out.println("toDate: " + toDate);
+
                 List<UserAction> actions = repository.findAll();
-                return actions.stream()
+                List<UserAction> filteredActions = actions.stream()
                                 .filter(action -> action.getUserId().equals(userId))
+                                .filter(action -> isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
                                 .sorted(Comparator.comparing(UserAction::getTimestamp).reversed())
                                 .collect(Collectors.toList());
+
+                System.out.println("Found " + filteredActions.size() + " actions for user " + userId);
+                return filteredActions;
         }
 
         @GetMapping("/stats/by-category")
@@ -93,11 +106,16 @@ public class UserActionController {
                         @RequestParam(required = false) String toDate,
                         @RequestParam(required = false) List<String> userIds) {
 
+                System.out.println("=== BY CATEGORY REQUEST ===");
+                System.out.println("fromDate: " + fromDate);
+                System.out.println("toDate: " + toDate);
+                System.out.println("userIds: " + userIds);
+
                 return repository.findAll().stream()
                                 .filter(action -> "click_category".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 action.getProperties().containsKey("category") &&
-                                                isInDateRange(action.getTimestamp(), fromDate, toDate) &&
+                                                isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                 (userIds == null || userIds.isEmpty()
                                                                 || userIds.contains(action.getUserId())))
                                 .collect(Collectors.groupingBy(
@@ -123,7 +141,7 @@ public class UserActionController {
                                                         action.getProperties() != null &&
                                                         category.equals(action.getProperties().get("category")) &&
                                                         action.getProperties().containsKey("subcategory") &&
-                                                        isInDateRange(action.getTimestamp(), fromDate, toDate))
+                                                        isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
                                         .collect(Collectors.groupingBy(
                                                         action -> action.getProperties().get("subcategory").toString(),
                                                         Collectors.counting()));
@@ -135,7 +153,7 @@ public class UserActionController {
                                                 action.getProperties() != null &&
                                                 category.equals(action.getProperties().get("category")) &&
                                                 action.getProperties().containsKey("subcategory") &&
-                                                isInDateRange(action.getTimestamp(), fromDate, toDate) &&
+                                                isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                 userIds.contains(action.getUserId()))
                                 .collect(Collectors.groupingBy(
                                                 action -> Map.of(
@@ -171,7 +189,7 @@ public class UserActionController {
                                                         category.equals(action.getProperties().get("category")) &&
                                                         (subcategory == null || subcategory.equals(action.getProperties().get("subcategory"))) &&
                                                         action.getProperties().containsKey("item") &&
-                                                        isInDateRange(action.getTimestamp(), fromDate, toDate))
+                                                        isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
                                         .collect(Collectors.groupingBy(
                                                         action -> action.getProperties().get("item").toString(),
                                                         Collectors.counting()));
@@ -184,7 +202,7 @@ public class UserActionController {
                                                 category.equals(action.getProperties().get("category")) &&
                                                 (subcategory == null || subcategory.equals(action.getProperties().get("subcategory"))) &&
                                                 action.getProperties().containsKey("item") &&
-                                                isInDateRange(action.getTimestamp(), fromDate, toDate) &&
+                                                isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                 userIds.contains(action.getUserId()))
                                 .collect(Collectors.groupingBy(
                                                 action -> Map.of(
@@ -203,9 +221,34 @@ public class UserActionController {
         private boolean isInDateRange(LocalDateTime timestamp, String fromDate, String toDate) {
                 if (fromDate == null || toDate == null)
                         return true;
-                LocalDateTime from = LocalDateTime.parse(fromDate);
-                LocalDateTime to = LocalDateTime.parse(toDate);
-                return !timestamp.isBefore(from) && !timestamp.isAfter(to);
+//                LocalDateTime from = LocalDateTime.parse(fromDate);
+//                LocalDateTime to = LocalDateTime.parse(toDate);
+//                return !timestamp.isBefore(from) && !timestamp.isAfter(to);
+                try {
+                        // ניקוי פורמט: הסרת Z או +00:00 אם קיימים
+                        String cleanFrom = fromDate.replace("Z", "").replace("+00:00", "");
+                        String cleanTo = toDate.replace("Z", "").replace("+00:00", "");
+
+                        LocalDateTime from, to;
+
+                        if (cleanFrom.contains("T")) {
+                                from = LocalDateTime.parse(cleanFrom);
+                        } else {
+                                from = LocalDateTime.parse(cleanFrom + "T00:00:00");
+                        }
+
+                        if (cleanTo.contains("T")) {
+                                to = LocalDateTime.parse(cleanTo);
+                        } else {
+                                to = LocalDateTime.parse(cleanTo + "T23:59:59");
+                        }
+
+                        return (!timestamp.isBefore(from)) && (!timestamp.isAfter(to));
+
+                } catch (Exception e) {
+                        System.err.println("Error parsing date range: " + e.getMessage());
+                        return true;
+                }
         }
 
         @GetMapping("/stats/by-category-stacked")
@@ -218,7 +261,7 @@ public class UserActionController {
                                 .filter(action -> "click_category".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 action.getProperties().containsKey("category") &&
-                                                isInDateRange(action.getTimestamp(), fromDate, toDate) &&
+                                                isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                 (userIds == null || userIds.isEmpty()
                                                                 || userIds.contains(action.getUserId())))
                                 .collect(Collectors.groupingBy(
@@ -234,6 +277,108 @@ public class UserActionController {
                                         return result;
                                 })
                                 .collect(Collectors.toList());
+        }
+
+        // פעילות משתמש מפורטת עם פילטרי זמן מתוקנים
+        @GetMapping("/user-actions/user-activity/{userId}")
+        public List<Map<String, Object>> getUserActivity(
+                        @PathVariable String userId,
+                        @RequestParam(required = false) String fromDate,
+                        @RequestParam(required = false) String toDate) {
+                try {
+                        System.out.println("=== USER ACTIVITY REQUEST ===");
+                        System.out.println("userId: " + userId);
+                        System.out.println("fromDate: " + fromDate);
+                        System.out.println("toDate: " + toDate);
+
+                        List<UserAction> userActions = repository.findAll().stream()
+                                        .filter(action -> action.getUserId().equals(userId))
+                                        .filter(action -> isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
+                                        .sorted(Comparator.comparing(UserAction::getTimestamp).reversed())
+                                        .collect(Collectors.toList());
+
+                        System.out.println("Found " + userActions.size() + " actions for user " + userId);
+
+                        return userActions.stream()
+                                        .map(action -> {
+                                                Map<String, Object> item = new HashMap<>();
+                                                item.put("id", action.getId());
+                                                item.put("actionName", action.getActionName());
+                                                item.put("timestamp", formatDateTime(action.getTimestamp()));
+                                                item.put("sessionId", action.getSessionId());
+                                                item.put("properties", action.getProperties());
+                                                return item;
+                                        })
+                                        .collect(Collectors.toList());
+                } catch (Exception e) {
+                        System.err.println("❌ Error getting user activity: " + e.getMessage());
+                        e.printStackTrace();
+                        return new ArrayList<>();
+                }
+        }
+
+        @GetMapping("/user-actions/users")
+        public List<String> getAllUserIds() {
+                return repository.findAll().stream()
+                                .map(UserAction::getUserId)
+                                .distinct()
+                                .sorted()
+                                .collect(Collectors.toList());
+        }
+
+        private boolean isInDateRangeFixed(LocalDateTime timestamp, String fromDate, String toDate) {
+                if (fromDate == null || toDate == null) {
+                        System.out.println("No date filter applied");
+                        return true;
+                }
+
+                try {
+                        // המרה של תאריכים מ-ISO format ל-LocalDateTime
+                        LocalDateTime from = parseISODateTime(fromDate);
+                        LocalDateTime to = parseISODateTime(toDate);
+
+                        System.out.println("Checking timestamp: " + timestamp + " against range: " + from + " to " + to);
+
+                        boolean inRange = !timestamp.isBefore(from) && !timestamp.isAfter(to);
+                        System.out.println("In range: " + inRange);
+
+                        return inRange;
+                } catch (Exception e) {
+                        System.err.println("❌ Error parsing date range: " + e.getMessage());
+                        e.printStackTrace();
+                        return true;
+                }
+        }
+
+        private LocalDateTime parseISODateTime(String dateStr) {
+                if (dateStr == null) return null;
+
+                try {
+                        // המרה מ-ISO string ל-LocalDateTime עם התחשבות ב-timezone
+                        java.time.Instant instant = java.time.Instant.parse(dateStr);
+                        // המרה לזמן מקומי (ישראל) - זה יתאים את הזמן לזמן המקומי
+                        LocalDateTime result = instant.atZone(java.time.ZoneId.of("Asia/Jerusalem")).toLocalDateTime();
+                        System.out.println("🕐 Parsed date: " + dateStr + " -> " + result + " (Israel time)");
+                        return result;
+                } catch (Exception e) {
+                        System.err.println("❌ Error parsing date: " + dateStr + " - " + e.getMessage());
+                        // fallback - ננסה עם הפורמט הישן
+                        try {
+                                String clean = dateStr.replace("Z", "").split("\\+")[0];
+                                if (clean.contains(".")) {
+                                        clean = clean.substring(0, clean.indexOf("."));
+                                }
+                                return LocalDateTime.parse(clean);
+                        } catch (Exception e2) {
+                                System.err.println("❌ Fallback parsing also failed: " + e2.getMessage());
+                                return LocalDateTime.now();
+                        }
+                }
+        }
+
+        private String formatDateTime(LocalDateTime dateTime) {
+                if (dateTime == null) return null;
+                return dateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
         }
 
 }
