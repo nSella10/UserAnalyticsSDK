@@ -312,6 +312,17 @@ public class ScreenTimeController {
 
         String lowerScreenName = screenName.toLowerCase();
 
+        // זיהוי קטגוריות ספציפיות מתוך שם המסך החדש
+        if (lowerScreenName.contains("categoryactivity_")) {
+            String category = extractCategoryFromScreenName(screenName, "CategoryActivity_");
+            return category != null ? category : "עיון בקטגוריות";
+        }
+
+        if (lowerScreenName.contains("itemdetailactivity_")) {
+            String category = extractCategoryFromScreenName(screenName, "ItemDetailActivity_");
+            return category != null ? category : "צפייה בפרטים";
+        }
+
         // קטגוריות ספורט
         if (lowerScreenName.contains("sport") || lowerScreenName.contains("football") ||
             lowerScreenName.contains("basketball") || lowerScreenName.contains("tennis") ||
@@ -329,7 +340,9 @@ public class ScreenTimeController {
         // קטגוריות בידור
         if (lowerScreenName.contains("entertainment") || lowerScreenName.contains("movie") ||
             lowerScreenName.contains("music") || lowerScreenName.contains("game") ||
-            lowerScreenName.contains("בידור") || lowerScreenName.contains("סרט")) {
+            lowerScreenName.contains("בידור") || lowerScreenName.contains("סרט") ||
+            lowerScreenName.contains("מוזיקה") || lowerScreenName.contains("סרטים") ||
+            lowerScreenName.contains("משחקים")) {
             return "בידור";
         }
 
@@ -338,13 +351,54 @@ public class ScreenTimeController {
             return "חדשות";
         }
 
+        // קטגוריות נוספות
+        if (lowerScreenName.contains("ספרים") || lowerScreenName.contains("book")) {
+            return "ספרים";
+        }
+
+        if (lowerScreenName.contains("אוכל") || lowerScreenName.contains("food")) {
+            return "אוכל";
+        }
+
+        if (lowerScreenName.contains("טיולים") || lowerScreenName.contains("travel")) {
+            return "טיולים";
+        }
+
         // אם זה MainActivity או דף ראשי
         if (lowerScreenName.contains("main") || lowerScreenName.contains("home") ||
             lowerScreenName.contains("ראשי")) {
             return "דף ראשי";
         }
 
+        // אם זה CategoryActivity, ננסה לזהות לפי הקונטקסט
+        if (lowerScreenName.contains("category")) {
+            return "עיון בקטגוריות";
+        }
+
+        // אם זה ItemDetailActivity
+        if (lowerScreenName.contains("itemdetail") || lowerScreenName.contains("detail")) {
+            return "צפייה בפרטים";
+        }
+
         return "אחר";
+    }
+
+    // פונקציה עזר לחילוץ שם הקטגוריה מתוך שם המסך
+    private String extractCategoryFromScreenName(String screenName, String prefix) {
+        try {
+            int startIndex = screenName.indexOf(prefix);
+            if (startIndex != -1) {
+                String categoryPart = screenName.substring(startIndex + prefix.length());
+                // אם יש תת-קטגוריה, נקח רק את הקטגוריה הראשית
+                String[] parts = categoryPart.split("_");
+                if (parts.length > 0) {
+                    return parts[0];
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error extracting category from screen name: " + e.getMessage());
+        }
+        return null;
     }
 
     private LocalDateTime parseISODateTime(String dateStr) {

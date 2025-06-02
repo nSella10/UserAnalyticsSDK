@@ -394,7 +394,7 @@ function MultiPieCharts({ selectedUsers }) {
             </div>
 
             {/* Charts Container */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* Categories Chart */}
                 <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden">
                     {/* Animated background gradient */}
@@ -470,14 +470,21 @@ function MultiPieCharts({ selectedUsers }) {
                             </div>
                         )}
                     </div>
+                </div>
 
-                    {/* Subcategories Chart */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white text-xs">
+                {/* Subcategories Chart */}
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden">
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-pink-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-sm shadow-lg">
                                 🏷️
                             </div>
-                            <h3 className="text-lg font-bold text-gray-800">Subcategories</h3>
+                            <h3 className="text-xl font-bold text-gray-800">Subcategories</h3>
+                            <div className="flex-1"></div>
+                            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
                             {selectedCategory && (
                                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
                                     {selectedCategory}
@@ -544,14 +551,21 @@ function MultiPieCharts({ selectedUsers }) {
                             </div>
                         )}
                     </div>
+                </div>
 
-                    {/* Items Chart */}
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center text-white text-xs">
+                {/* Items Chart */}
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden">
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-teal-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white text-sm shadow-lg">
                                 📦
                             </div>
-                            <h3 className="text-lg font-bold text-gray-800">Items</h3>
+                            <h3 className="text-xl font-bold text-gray-800">Items</h3>
+                            <div className="flex-1"></div>
+                            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                             {selectedSubcategory && (
                                 <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
                                     {selectedSubcategory}
@@ -613,6 +627,7 @@ function MultiPieCharts({ selectedUsers }) {
                 </div>
             </div>
         </div>
+
     );
 }
 

@@ -16,14 +16,16 @@ import java.util.*;
 public class ItemDetailActivity extends AppCompatActivity {
 
     private RecyclerView itemRecycler;
+    private String category; // הוספת שדה לשמירת הקטגוריה
+    private String subcategory; // הוספת שדה לשמירת התת-קטגוריה
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_detail);
 
-        String category = getIntent().getStringExtra("category");
-        String subcategory = getIntent().getStringExtra("subcategory");
+        category = getIntent().getStringExtra("category"); // שמירה בשדה הקלאס
+        subcategory = getIntent().getStringExtra("subcategory"); // שמירה בשדה הקלאס
 
         setTitle("קטגוריה: " + category + " > " + subcategory);
 
@@ -37,7 +39,9 @@ public class ItemDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AnalyticsTracker.startScreen("ItemDetailActivity");
+        // שליחת שם המסך עם הקטגוריה והתת-קטגוריה
+        String screenName = "ItemDetailActivity_" + category + "_" + subcategory;
+        AnalyticsTracker.startScreen(screenName);
     }
 
     @Override
