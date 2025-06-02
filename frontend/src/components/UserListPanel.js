@@ -8,6 +8,8 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger }) {
 
   useEffect(() => {
     setIsLoading(true);
+
+    // זמנית - נשלח בקשה בלי API Key
     fetch("http://localhost:8080/track/stats/all-users")
       .then(res => res.json())
       .then(data => {

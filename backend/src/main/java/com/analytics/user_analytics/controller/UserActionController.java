@@ -2,12 +2,14 @@ package com.analytics.user_analytics.controller;
 
 import com.analytics.user_analytics.model.User;
 import com.analytics.user_analytics.model.UserAction;
+import com.analytics.user_analytics.model.Developer;
 import com.analytics.user_analytics.repository.UserActionRepository;
 import com.analytics.user_analytics.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,8 +51,18 @@ public class UserActionController {
         }
 
         @GetMapping("/stats/all-users")
-        public List<User> getAllUsers() {
-                return userRepository.findAll();
+        public List<User> getAllUsers(HttpServletRequest request) {
+                // קבלת המפתח מה-request
+                Developer developer = (Developer) request.getAttribute("developer");
+                if (developer == null) {
+                        return new ArrayList<>(); // החזרת רשימה ריקה אם אין הרשאה
+                }
+
+                // זמנית - החזרת כל המשתמשים (עד שנעדכן את מודל User)
+                List<User> allUsers = userRepository.findAll();
+
+                // בעתיד נסנן לפי API Key של האפליקציה הנבחרת
+                return allUsers;
         }
 
         @GetMapping("/stats/by-date")
