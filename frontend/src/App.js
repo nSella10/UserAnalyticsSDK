@@ -117,22 +117,7 @@ function App() {
 
           {/* User Click Logs */}
           {isUserFilterActive && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-gray-200 shadow-lg">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center text-white text-sm">
-                  📋
-                </div>
-                <h2 className="text-2xl font-bold text-gray-800">User Activity Logs</h2>
-                <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
-                  {selectedUsers.length} user{selectedUsers.length !== 1 ? 's' : ''} selected
-                </span>
-              </div>
-              <div className="space-y-6">
-                {selectedUsers.map(userId => (
-                  <UserClickLog key={userId} userId={userId} />
-                ))}
-              </div>
-            </div>
+            <UserClickLog selectedUserIds={selectedUsers} />
           )}
 
           {/* Footer */}

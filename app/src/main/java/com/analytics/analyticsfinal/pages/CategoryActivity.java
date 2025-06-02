@@ -169,6 +169,7 @@ import java.util.*;
 public class CategoryActivity extends AppCompatActivity {
 
     private RecyclerView subcategoryRecycler;
+    private String category; // הוספת שדה לשמירת הקטגוריה
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -176,7 +177,7 @@ public class CategoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        String category = getIntent().getStringExtra("category");
+        category = getIntent().getStringExtra("category"); // שמירה בשדה הקלאס
 
         TextView categoryTitle = findViewById(R.id.categoryTitle);
         categoryTitle.setText("קטגוריה: " + category);
@@ -211,7 +212,9 @@ public class CategoryActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AnalyticsTracker.startScreen("CategoryActivity");
+        // שליחת שם המסך עם הקטגוריה הספציפית
+        String screenName = "CategoryActivity_" + category;
+        AnalyticsTracker.startScreen(screenName);
     }
 
     @Override
