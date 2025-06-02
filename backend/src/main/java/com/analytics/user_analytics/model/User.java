@@ -23,6 +23,7 @@ public class User {
     private int age;
     private Gender gender;
     private LocalDateTime registerAt;
+    private String apiKey; // API Key של המפתח שיצר את המשתמש
 
     // Default constructor
     public User() {}
@@ -63,4 +64,7 @@ public class User {
 
     public LocalDateTime getRegisterAt() { return registerAt; }
     public void setRegisterAt(LocalDateTime registerAt) { this.registerAt = registerAt; }
+
+    public String getApiKey() { return apiKey; }
+    public void setApiKey(String apiKey) { this.apiKey = apiKey; }
 }

@@ -62,9 +62,16 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
     const availableUsers = selectedUserIds.length > 0 ? selectedUserIds : (initialUserId ? [initialUserId] : []);
     const currentUserId = activeUserId || (availableUsers.length > 0 ? availableUsers[0] : initialUserId);
 
-    // הגדרת המשתמש הפעיל הראשוני
+    // הגדרת המשתמש הפעיל הראשוני ועדכון כשהמשתמשים הנבחרים משתנים
     React.useEffect(() => {
-        if (!activeUserId && availableUsers.length > 0) {
+        if (availableUsers.length === 0) {
+            // אם אין משתמשים נבחרים, נקה את הכל
+            setActiveUserId(null);
+            setLogs([]);
+            setScreenSummary(null);
+            setUserLabel('');
+        } else if (!activeUserId || !availableUsers.includes(activeUserId)) {
+            // אם אין משתמש פעיל או שהמשתמש הפעיל לא ברשימה, בחר את הראשון
             setActiveUserId(availableUsers[0]);
         }
     }, [availableUsers, activeUserId]);
@@ -79,7 +86,13 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
 
     // שליפת הפעולות לפי יוזר
     useEffect(() => {
-        if (!currentUserId) return;
+        if (!currentUserId) {
+            // אם אין משתמש פעיל, נקה את הנתונים
+            setLogs([]);
+            setScreenSummary(null);
+            setUserLabel('');
+            return;
+        }
 
         // בניית URL עם פרמטרי זמן
         const params = new URLSearchParams();
@@ -153,6 +166,25 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
                 return '📂';
         }
     };
+
+    // אם אין משתמשים זמינים, הצג הודעה
+    if (availableUsers.length === 0) {
+        return (
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-sm">
+                        📋
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-800">Activity Log</h2>
+                </div>
+                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <span className="text-4xl mb-4 opacity-50">👥</span>
+                    <p className="text-lg font-medium mb-2">לא נבחרו משתמשים</p>
+                    <p className="text-sm">בחר משתמשים מהרשימה כדי לראות את הפעילות שלהם.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200 shadow-lg">
