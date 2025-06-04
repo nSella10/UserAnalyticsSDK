@@ -6,7 +6,7 @@ import {
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
 
-const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory }) => {
+const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory, selectedApp }) => {
   const [data, setData] = useState([]);
   const [viewMode, setViewMode] = useState('category');
   const [categories, setCategories] = useState([]);
@@ -14,7 +14,9 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
   const [timeRange, setTimeRange] = useState('all'); // 'all', 'day', 'week', 'month'
 
   useEffect(() => {
-    fetch("http://localhost:8080/track/stats/all-users")
+    if (!selectedApp || !selectedApp.apiKey) return;
+
+    fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
       .then(res => res.json())
       .then(users => {
         const map = {};
@@ -23,12 +25,13 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
         });
         setUsersMap(map);
       });
-  }, []);
+  }, [selectedApp]);
 
   useEffect(() => {
-    if (viewMode !== 'category') {
+    if (viewMode !== 'category' && selectedApp && selectedApp.apiKey) {
       const params = new URLSearchParams();
       TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+      params.append('apiKey', selectedApp.apiKey);
 
       fetch(`http://localhost:8080/track/stats/by-category?${params}`)
         .then(res => res.json())
@@ -40,9 +43,11 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
           }
         });
     }
-  }, [viewMode, timeRange]);
+  }, [viewMode, timeRange, selectedApp]);
 
   useEffect(() => {
+    if (!selectedApp || !selectedApp.apiKey) return;
+
     const params = new URLSearchParams();
     selectedUsers.forEach(id => params.append('userIds', id));
     if (selectedCategory && viewMode !== 'category') {
@@ -51,6 +56,7 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
 
     // הוספת פרמטרים של טווח זמן
     TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+    params.append('apiKey', selectedApp.apiKey);
 
     const endpoint = viewMode === 'category'
       ? 'by-category-stacked'
@@ -86,7 +92,7 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
 
         setData(formatted);
       });
-  }, [viewMode, selectedUsers, selectedCategory, timeRange]);
+  }, [viewMode, selectedUsers, selectedCategory, timeRange, selectedApp]);
 
   const userIds = selectedUsers.length > 0
     ? selectedUsers

@@ -1,16 +1,22 @@
 
 import React, { useEffect, useState } from "react";
 
-function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger }) {
+function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selectedApp }) {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!selectedApp || !selectedApp.apiKey) {
+      setUsers([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
 
-    // זמנית - נשלח בקשה בלי API Key
-    fetch("http://localhost:8080/track/stats/all-users")
+    // שליחת בקשה עם API Key של האפליקציה הנבחרת
+    fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
       .then(res => res.json())
       .then(data => {
         setUsers(Array.isArray(data) ? data : []);
@@ -21,7 +27,7 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger }) {
         setUsers([]);
         setIsLoading(false);
       });
-  }, [refreshTrigger]);
+  }, [refreshTrigger, selectedApp]);
 
   const isSelected = (userId) => {
     return selectUserIds?.includes?.(userId);
@@ -93,8 +99,8 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger }) {
         <button
           onClick={handleClearFilter}
           className={`w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${selectUserIds.length === 0
-              ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 text-blue-700 shadow-sm'
-              : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50'
+            ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 text-blue-700 shadow-sm'
+            : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50'
             } transform hover:scale-[1.02] active:scale-[0.98]`}
         >
           <span className="text-base">🔄</span>
@@ -129,8 +135,8 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger }) {
                 <button
                   onClick={() => handleToggleUser(user.id)}
                   className={`w-full p-4 rounded-xl transition-all duration-200 flex items-center gap-4 text-left group relative overflow-hidden ${isSelected(user.id)
-                      ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 shadow-md transform scale-[1.02]'
-                      : 'bg-white/70 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md hover:transform hover:scale-[1.01]'
+                    ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 shadow-md transform scale-[1.02]'
+                    : 'bg-white/70 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md hover:transform hover:scale-[1.01]'
                     }`}
                 >
                   {/* Animated background effect */}
@@ -138,8 +144,8 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger }) {
 
                   {/* User Avatar */}
                   <div className={`relative w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md ${isSelected(user.id)
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500'
-                      : 'bg-gradient-to-r from-gray-400 to-gray-500'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500'
+                    : 'bg-gradient-to-r from-gray-400 to-gray-500'
                     }`}>
                     {user.firstName.charAt(0)}{user.lastName.charAt(0)}
                   </div>

@@ -25,6 +25,7 @@ public class ScreenTime {
 
     private long duration; // משך הזמן במילישניות
     private String sessionId; // מזהה סשן (אופציונלי)
+    private String apiKey; // API Key של האפליקציה
 
     // קונסטרקטורים
     public ScreenTime() {
@@ -39,7 +40,8 @@ public class ScreenTime {
         this.timestamp = LocalDateTime.now();
     }
 
-    public ScreenTime(String userId, String screenName, LocalDateTime startTime, LocalDateTime endTime, long duration, String sessionId) {
+    public ScreenTime(String userId, String screenName, LocalDateTime startTime, LocalDateTime endTime, long duration,
+            String sessionId) {
         this.userId = userId;
         this.screenName = screenName;
         this.startTime = startTime;
@@ -112,6 +114,14 @@ public class ScreenTime {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     @Override

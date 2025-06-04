@@ -87,6 +87,7 @@ function App() {
       <AppSelector
         developer={developer}
         onAppSelected={handleAppSelected}
+        onLogout={handleLogout}
       />
     );
   }
@@ -108,6 +109,7 @@ function App() {
             selectUserIds={selectedUsers}
             onUserSelect={setSelectedUsers}
             refreshTrigger={refreshTrigger}
+            selectedApp={selectedApp}
           />
         </aside>
 
@@ -205,6 +207,7 @@ function App() {
                 selectedUsers={selectedUsers}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                selectedApp={selectedApp}
               />
             </div>
 
@@ -219,13 +222,14 @@ function App() {
               <MultiPieCharts
                 selectedUsers={selectedUsers}
                 selectedCategory={selectedCategory}
+                selectedApp={selectedApp}
               />
             </div>
           </div>
 
           {/* User Click Logs */}
           {isUserFilterActive && (
-            <UserClickLog selectedUserIds={selectedUsers} />
+            <UserClickLog selectedUserIds={selectedUsers} selectedApp={selectedApp} />
           )}
 
           {/* Footer */}

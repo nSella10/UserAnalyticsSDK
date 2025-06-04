@@ -1,12 +1,8 @@
 package com.analytics.analyticsfinal;
 
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-
-
-
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,8 +22,6 @@ import com.analytics.analyticsfinal.pages.UserProfileActivity;
 import com.analytics.analyticsfinal.utils.UserManager;
 import com.analytics.analyticstracker.AnalyticsTracker;
 
-
-
 import java.util.*;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,15 +39,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle("My Interests");
 
-        // Initialize the AnalyticsTracker with the server URL
-        AnalyticsTracker.init("http://192.168.7.7:8080/");
-
-
-
+        // Initialize the AnalyticsTracker with the server URL and API Key
+        // החלף את ה-API Key בזה שקיבלת מהדשבורד
+        // 192.168.7.7 זה ה-IP של המחשב ברשת המקומית
+        String serverUrl = "http://192.168.7.7:8080/";
+        Log.d("MainActivity", "🔗 Initializing AnalyticsTracker with URL: " + serverUrl);
+        AnalyticsTracker.init(serverUrl, "ak_77dc46998b1e42458770029d");
 
         categoryRecycler = findViewById(R.id.categoryRecycler);
         categoryRecycler.setLayoutManager(new GridLayoutManager(this, 2));
-
 
         List<DisplayItem> categoryList = generateCategories();
 
@@ -79,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         AnalyticsTracker.startScreen("MainActivity");
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -92,9 +85,6 @@ public class MainActivity extends AppCompatActivity {
             Log.w("AnalyticsTracker", "User ID is null in onPause – not sending screen duration.");
         }
     }
-
-
-
 
     private List<DisplayItem> generateCategories() {
         List<DisplayItem> list = new ArrayList<>();
@@ -113,24 +103,24 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu); // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu); // Inflate the menu; this adds items to the action bar if it
+                                                           // is present.
         return true;
-
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == R.id.menu_profile) {
-                startActivity(new Intent(this, UserProfileActivity.class));
-                return true;
-            } else if (id == R.id.menu_logout) {
-                getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply();
-                startActivity(new Intent(this, AuthActivity.class));
-                finish();
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        if (id == R.id.menu_profile) {
+            startActivity(new Intent(this, UserProfileActivity.class));
+            return true;
+        } else if (id == R.id.menu_logout) {
+            getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply();
+            startActivity(new Intent(this, AuthActivity.class));
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import SDKIntegrationCode from './SDKIntegrationCode';
 
-const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
+const AppSelector = ({ developer, onAppSelected, onCreateApp, onLogout }) => {
   const [apps, setApps] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -10,6 +11,8 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showSDKCode, setShowSDKCode] = useState(false);
+  const [selectedAppForSDK, setSelectedAppForSDK] = useState(null);
 
   useEffect(() => {
     fetchApps();
@@ -62,6 +65,11 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
         setSuccess('אפליקציה נוצרה בהצלחה!');
         setNewApp({ appName: '', description: '' });
         setShowCreateForm(false);
+
+        // הצגת קוד ה-SDK לאפליקציה החדשה
+        setSelectedAppForSDK(data.app);
+        setShowSDKCode(true);
+
         fetchApps(); // רענון רשימת האפליקציות
       } else {
         setError(data.error || 'שגיאה ביצירת האפליקציה');
@@ -90,10 +98,23 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">האפליקציות שלי</h1>
-          <p className="text-gray-600">ברוך הבא, {developer.firstName} {developer.lastName}</p>
-          <p className="text-sm text-gray-500">{developer.companyName}</p>
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">האפליקציות שלי</h1>
+            <p className="text-gray-600">ברוך הבא, {developer.firstName} {developer.lastName}</p>
+            <p className="text-sm text-gray-500">{developer.companyName}</p>
+          </div>
+
+          {/* Logout Button */}
+          <div className="flex-shrink-0">
+            <button
+              onClick={onLogout}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors font-medium flex items-center gap-2"
+            >
+              <span>🚪</span>
+              התנתק
+            </button>
+          </div>
         </div>
 
         {/* Messages */}
@@ -121,7 +142,7 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
                   <p className="text-sm text-gray-500">נוצר: {new Date(app.createdAt).toLocaleDateString('he-IL')}</p>
                 </div>
               </div>
-              
+
               {app.description && (
                 <p className="text-gray-600 mb-4 text-sm">{app.description}</p>
               )}
@@ -131,12 +152,23 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
                   {/* כאן נוסיף מספר משתמשים בעתיד */}
                   0 משתמשים
                 </span>
-                <button
-                  onClick={() => handleSelectApp(app)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-                >
-                  צפה בנתונים
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedAppForSDK(app);
+                      setShowSDKCode(true);
+                    }}
+                    className="bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm font-medium"
+                  >
+                    קוד SDK
+                  </button>
+                  <button
+                    onClick={() => handleSelectApp(app)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                  >
+                    צפה בנתונים
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -181,7 +213,7 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
               <h3 className="text-lg font-semibold mb-4">צור אפליקציה חדשה</h3>
-              
+
               <form onSubmit={handleCreateApp}>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -190,26 +222,26 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
                   <input
                     type="text"
                     value={newApp.appName}
-                    onChange={(e) => setNewApp({...newApp, appName: e.target.value})}
+                    onChange={(e) => setNewApp({ ...newApp, appName: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="לדוגמה: MyGame"
                     required
                   />
                 </div>
-                
+
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     תיאור (אופציונלי)
                   </label>
                   <textarea
                     value={newApp.description}
-                    onChange={(e) => setNewApp({...newApp, description: e.target.value})}
+                    onChange={(e) => setNewApp({ ...newApp, description: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="תיאור קצר של האפליקציה..."
                     rows="3"
                   />
                 </div>
-                
+
                 <div className="flex justify-end space-x-3 space-x-reverse">
                   <button
                     type="button"
@@ -228,6 +260,17 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
               </form>
             </div>
           </div>
+        )}
+
+        {/* SDK Integration Code Modal */}
+        {showSDKCode && selectedAppForSDK && (
+          <SDKIntegrationCode
+            app={selectedAppForSDK}
+            onClose={() => {
+              setShowSDKCode(false);
+              setSelectedAppForSDK(null);
+            }}
+          />
         )}
       </div>
     </div>
