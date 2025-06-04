@@ -20,6 +20,7 @@ public class UserAction {
 
     private String sessionId; // מזהה סשן (אופציונלי)
     private Map<String, Object> properties;
+    private String apiKey; // API Key של האפליקציה שיצרה את הפעולה
 
     //constructor
     public UserAction() {
@@ -88,6 +89,14 @@ public class UserAction {
         this.sessionId = sessionId;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
     @Override
     public String toString() {
         return "UserAction{" +
@@ -97,6 +106,7 @@ public class UserAction {
                 ", timestamp=" + timestamp +
                 ", sessionId='" + sessionId + '\'' +
                 ", properties=" + properties +
+                ", apiKey='" + apiKey + '\'' +
                 '}';
     }
 }

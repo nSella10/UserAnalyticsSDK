@@ -36,4 +36,13 @@ public interface ScreenTimeRepository extends MongoRepository<ScreenTime, String
     // מציאת זמני מסך לפי משתמש ומסך בטווח זמנים
     List<ScreenTime> findByUserIdAndScreenNameAndTimestampBetween(
         String userId, String screenName, LocalDateTime start, LocalDateTime end);
+
+    // מציאת זמני מסך לפי API Key של האפליקציה
+    List<ScreenTime> findByApiKey(String apiKey);
+
+    // מציאת זמני מסך לפי משתמש ו-API Key
+    List<ScreenTime> findByUserIdAndApiKey(String userId, String apiKey);
+
+    // מציאת זמני מסך לפי API Key וטווח זמנים
+    List<ScreenTime> findByApiKeyAndTimestampBetween(String apiKey, LocalDateTime start, LocalDateTime end);
 }

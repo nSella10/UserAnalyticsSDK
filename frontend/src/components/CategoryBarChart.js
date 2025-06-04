@@ -14,7 +14,17 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
   const [timeRange, setTimeRange] = useState('all'); // 'all', 'day', 'week', 'month'
 
   useEffect(() => {
-    fetch("http://localhost:8080/track/stats/all-users")
+    // קבלת האפליקציה הנבחרת מ-localStorage
+    const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+    const apiKey = selectedApp.apiKey;
+
+    if (!apiKey) {
+      console.error("No API key found");
+      setUsersMap({});
+      return;
+    }
+
+    fetch(`http://localhost:8080/track/stats/all-users?apiKey=${apiKey}`)
       .then(res => res.json())
       .then(users => {
         const map = {};
@@ -27,7 +37,18 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
 
   useEffect(() => {
     if (viewMode !== 'category') {
+      // קבלת האפליקציה הנבחרת מ-localStorage
+      const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+      const apiKey = selectedApp.apiKey;
+
+      if (!apiKey) {
+        console.error("No API key found");
+        setCategories([]);
+        return;
+      }
+
       const params = new URLSearchParams();
+      params.append('apiKey', apiKey);
       TimeRangeUtils.addTimeRangeToParams(params, timeRange);
 
       fetch(`http://localhost:8080/track/stats/by-category?${params}`)
@@ -43,7 +64,18 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
   }, [viewMode, timeRange]);
 
   useEffect(() => {
+    // קבלת האפליקציה הנבחרת מ-localStorage
+    const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+    const apiKey = selectedApp.apiKey;
+
+    if (!apiKey) {
+      console.error("No API key found");
+      setData([]);
+      return;
+    }
+
     const params = new URLSearchParams();
+    params.append('apiKey', apiKey);
     selectedUsers.forEach(id => params.append('userIds', id));
     if (selectedCategory && viewMode !== 'category') {
       params.append('category', selectedCategory);

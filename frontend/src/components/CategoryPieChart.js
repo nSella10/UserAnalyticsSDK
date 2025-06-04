@@ -11,7 +11,19 @@ function CategoryPieChart({ selectedUsers }) {
     const [timeRange, setTimeRange] = useState('all'); // 'all', 'day', 'week', 'month'
 
     useEffect(() => {
+        // קבלת האפליקציה הנבחרת מ-localStorage
+        const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+        const apiKey = selectedApp.apiKey;
+
+        if (!apiKey) {
+            console.error("No API key found");
+            setData([]);
+            setTotal(0);
+            return;
+        }
+
         const params = new URLSearchParams();
+        params.append('apiKey', apiKey);
         if (selectedUsers && selectedUsers.length > 0) {
             selectedUsers.forEach(id => params.append('userIds', id));
         }

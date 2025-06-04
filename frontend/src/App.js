@@ -19,8 +19,9 @@ function App() {
   useEffect(() => {
     const savedDeveloper = localStorage.getItem('developer');
     const savedApp = localStorage.getItem('selectedApp');
+    const token = localStorage.getItem('token');
 
-    if (savedDeveloper) {
+    if (savedDeveloper && token) {
       try {
         const developerData = JSON.parse(savedDeveloper);
         setDeveloper(developerData);
@@ -37,7 +38,17 @@ function App() {
         console.error('Error parsing saved data:', error);
         localStorage.removeItem('developer');
         localStorage.removeItem('selectedApp');
+        localStorage.removeItem('token');
       }
+    } else {
+      // אם אין token או developer data, נקה הכל
+      localStorage.removeItem('developer');
+      localStorage.removeItem('selectedApp');
+      localStorage.removeItem('token');
+      setIsAuthenticated(false);
+      setDeveloper(null);
+      setSelectedApp(null);
+      setShowAppSelector(false);
     }
   }, []);
 
@@ -67,6 +78,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('developer');
     localStorage.removeItem('selectedApp');
+    localStorage.removeItem('token'); // הסרת JWT token
     setIsAuthenticated(false);
     setDeveloper(null);
     setSelectedApp(null);

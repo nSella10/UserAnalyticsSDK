@@ -43,13 +43,12 @@ function DeveloperAuth({ onAuthSuccess }) {
 
             if (response.ok) {
                 // שמירת הטוקן ופרטי המפתח
-                localStorage.setItem('developerToken', data.token);
-                localStorage.setItem('developerData', JSON.stringify(data.developer));
-                localStorage.setItem('apiKey', data.apiKey);
-                
+                localStorage.setItem('token', data.token); // שמירה בשם 'token' כמו שהקומפונטים מצפים
+                localStorage.setItem('developer', JSON.stringify(data.developer));
+
                 setSuccess('התחברות מוצלחת!');
                 setTimeout(() => {
-                    onAuthSuccess(data.developer, data.apiKey);
+                    onAuthSuccess(data.developer);
                 }, 1000);
             } else {
                 setError(data.error || 'שגיאה בהתחברות');

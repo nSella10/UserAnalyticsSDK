@@ -78,7 +78,17 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
 
     // שליפת המשתמשים
     useEffect(() => {
-        fetch("http://localhost:8080/track/stats/all-users")
+        // קבלת האפליקציה הנבחרת מ-localStorage
+        const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+        const apiKey = selectedApp.apiKey;
+
+        if (!apiKey) {
+            console.error("No API key found");
+            setUsers([]);
+            return;
+        }
+
+        fetch(`http://localhost:8080/track/stats/all-users?apiKey=${apiKey}`)
             .then(res => res.json())
             .then(data => setUsers(data))
             .catch(err => console.error("Error fetching users:", err));
@@ -94,9 +104,21 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
             return;
         }
 
-        // בניית URL עם פרמטרי זמן
+        // קבלת האפליקציה הנבחרת מ-localStorage
+        const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+        const apiKey = selectedApp.apiKey;
+
+        if (!apiKey) {
+            console.error("No API key found");
+            setLogs([]);
+            setScreenSummary(null);
+            return;
+        }
+
+        // בניית URL עם פרמטרי זמן ו-API Key
         const params = new URLSearchParams();
         params.append('userId', currentUserId);
+        params.append('apiKey', apiKey);
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
 
         // טען לוגים וסנן את שורות SCREEN_DURATION
@@ -112,6 +134,7 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
 
         // טען סיכום זמני מסך
         const summaryParams = new URLSearchParams();
+        summaryParams.append('apiKey', apiKey);
         TimeRangeUtils.addTimeRangeToParams(summaryParams, timeRange);
 
         fetch(`http://localhost:8080/screen-time/user-screen-summary/${currentUserId}?${summaryParams.toString()}`)

@@ -42,7 +42,17 @@ function MultiPieCharts({ selectedUsers }) {
 
     // שליפת שמות המשתמשים
     useEffect(() => {
-        fetch("http://localhost:8080/track/stats/all-users")
+        // קבלת האפליקציה הנבחרת מ-localStorage
+        const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+        const apiKey = selectedApp.apiKey;
+
+        if (!apiKey) {
+            console.error("No API key found");
+            setUsersMap({});
+            return;
+        }
+
+        fetch(`http://localhost:8080/track/stats/all-users?apiKey=${apiKey}`)
             .then(res => res.json())
             .then(users => {
                 const map = {};
@@ -57,7 +67,21 @@ function MultiPieCharts({ selectedUsers }) {
     // שליפת נתוני קטגוריות
     useEffect(() => {
         setLoading(prev => ({ ...prev, category: true }));
+
+        // קבלת האפליקציה הנבחרת מ-localStorage
+        const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+        const apiKey = selectedApp.apiKey;
+
+        if (!apiKey) {
+            console.error("No API key found");
+            setCategoryData([]);
+            setTotals(prev => ({ ...prev, category: 0 }));
+            setLoading(prev => ({ ...prev, category: false }));
+            return;
+        }
+
         const params = new URLSearchParams();
+        params.append('apiKey', apiKey);
         if (selectedUsers && selectedUsers.length > 0) {
             selectedUsers.forEach(id => params.append('userIds', id));
         }
@@ -105,7 +129,20 @@ function MultiPieCharts({ selectedUsers }) {
         setLoading(prev => ({ ...prev, subcategory: true }));
         setSubcategoryData([]); // איפוס נתונים קודמים
 
+        // קבלת האפליקציה הנבחרת מ-localStorage
+        const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+        const apiKey = selectedApp.apiKey;
+
+        if (!apiKey) {
+            console.error("No API key found");
+            setSubcategoryData([]);
+            setTotals(prev => ({ ...prev, subcategory: 0 }));
+            setLoading(prev => ({ ...prev, subcategory: false }));
+            return;
+        }
+
         const params = new URLSearchParams();
+        params.append('apiKey', apiKey);
         if (selectedUsers && selectedUsers.length > 0) {
             selectedUsers.forEach(id => params.append('userIds', id));
         }
@@ -179,7 +216,20 @@ function MultiPieCharts({ selectedUsers }) {
         setLoading(prev => ({ ...prev, item: true }));
         setItemData([]); // איפוס נתונים קודמים
 
+        // קבלת האפליקציה הנבחרת מ-localStorage
+        const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+        const apiKey = selectedApp.apiKey;
+
+        if (!apiKey) {
+            console.error("No API key found");
+            setItemData([]);
+            setTotals(prev => ({ ...prev, item: 0 }));
+            setLoading(prev => ({ ...prev, item: false }));
+            return;
+        }
+
         const params = new URLSearchParams();
+        params.append('apiKey', apiKey);
         if (selectedUsers && selectedUsers.length > 0) {
             selectedUsers.forEach(id => params.append('userIds', id));
         }

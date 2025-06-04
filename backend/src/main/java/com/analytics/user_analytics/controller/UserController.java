@@ -22,8 +22,10 @@ import org.springframework.http.HttpStatus;
 
 
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"})
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -36,12 +38,19 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
+    public ResponseEntity<String> registerUser(@RequestBody User user, @RequestParam(required = false) String apiKey) {
         try {
             User existingUser = userRepository.findByEmail(user.getEmail());
             if (existingUser != null) {
                 System.out.println("⚠️ Email already exists: " + user.getEmail());
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
+            }
+
+            // הוספת API Key למשתמש
+            if (apiKey != null && !apiKey.isEmpty()) {
+                user.setApiKey(apiKey);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing API Key");
             }
 
             user.setRegisterAt(LocalDateTime.now());

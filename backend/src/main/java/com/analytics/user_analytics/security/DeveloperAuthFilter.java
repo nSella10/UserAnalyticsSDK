@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
+// @Component - מבוטל זמנית, משתמשים ב-ApiKeyAuthenticationFilter במקום
 public class DeveloperAuthFilter extends OncePerRequestFilter {
 
     @Autowired

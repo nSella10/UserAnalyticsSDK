@@ -23,7 +23,7 @@ public class User {
     private int age;
     private Gender gender;
     private LocalDateTime registerAt;
-    private String apiKey; // API Key של המפתח שיצר את המשתמש
+    private String apiKey; // API Key של האפליקציה שיצרה את המשתמש
 
     // Default constructor
     public User() {}

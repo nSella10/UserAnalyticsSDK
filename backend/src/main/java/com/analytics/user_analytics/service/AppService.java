@@ -39,6 +39,13 @@ public class AppService {
     public List<App> getAppsByDeveloper(String developerId) {
         return appRepository.findByDeveloperIdAndIsActiveTrue(developerId);
     }
+
+    /**
+     * מציאת אפליקציה לפי API Key
+     */
+    public App findByApiKey(String apiKey) {
+        return appRepository.findByApiKey(apiKey);
+    }
     
     /**
      * קבלת אפליקציה לפי API Key

@@ -26,13 +26,21 @@ public class UserActionController {
         private UserRepository userRepository;
 
         @PostMapping
-        public String trackUserAction(@RequestBody UserAction action) {
+        public String trackUserAction(@RequestBody UserAction action, @RequestParam(required = false) String apiKey) {
                 if (action.getUserId() == null || action.getActionName() == null) {
                         return "Missing userId or actionName";
                 }
                 if (action.getTimestamp() == null) {
                         action.setTimestamp(LocalDateTime.now());
                 }
+
+                // הוספת API Key לפעולה
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        action.setApiKey(apiKey);
+                } else {
+                        return "Missing API Key";
+                }
+
                 repository.save(action);
                 return "Action tracked successfully";
         }
@@ -51,18 +59,20 @@ public class UserActionController {
         }
 
         @GetMapping("/stats/all-users")
-        public List<User> getAllUsers(HttpServletRequest request) {
+        public List<User> getAllUsers(HttpServletRequest request, @RequestParam(required = false) String apiKey) {
                 // קבלת המפתח מה-request
                 Developer developer = (Developer) request.getAttribute("developer");
                 if (developer == null) {
                         return new ArrayList<>(); // החזרת רשימה ריקה אם אין הרשאה
                 }
 
-                // זמנית - החזרת כל המשתמשים (עד שנעדכן את מודל User)
-                List<User> allUsers = userRepository.findAll();
+                // אם יש API Key, נסנן לפי האפליקציה
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        return userRepository.findByApiKey(apiKey);
+                }
 
-                // בעתיד נסנן לפי API Key של האפליקציה הנבחרת
-                return allUsers;
+                // אחרת נחזיר רשימה ריקה (לא נציג את כל המשתמשים)
+                return new ArrayList<>();
         }
 
         @GetMapping("/stats/by-date")
@@ -94,16 +104,26 @@ public class UserActionController {
         public List<UserAction> getUserLogs(
                         @RequestParam String userId,
                         @RequestParam(required = false) String fromDate,
-                        @RequestParam(required = false) String toDate) {
+                        @RequestParam(required = false) String toDate,
+                        @RequestParam(required = false) String apiKey) {
 
                 System.out.println("=== USER LOGS REQUEST ===");
                 System.out.println("userId: " + userId);
                 System.out.println("fromDate: " + fromDate);
                 System.out.println("toDate: " + toDate);
+                System.out.println("apiKey: " + apiKey);
 
-                List<UserAction> actions = repository.findAll();
+                List<UserAction> actions;
+
+                // אם יש API Key, נסנן לפי משתמש ו-API Key
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        actions = repository.findByUserIdAndApiKey(userId, apiKey);
+                } else {
+                        // אחרת נחזיר רשימה ריקה (לא נציג נתונים ללא API Key)
+                        return new ArrayList<>();
+                }
+
                 List<UserAction> filteredActions = actions.stream()
-                                .filter(action -> action.getUserId().equals(userId))
                                 .filter(action -> isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
                                 .sorted(Comparator.comparing(UserAction::getTimestamp).reversed())
                                 .collect(Collectors.toList());
@@ -116,14 +136,26 @@ public class UserActionController {
         public Map<String, Long> getClicksByCategory(
                         @RequestParam(required = false) String fromDate,
                         @RequestParam(required = false) String toDate,
-                        @RequestParam(required = false) List<String> userIds) {
+                        @RequestParam(required = false) List<String> userIds,
+                        @RequestParam(required = false) String apiKey) {
 
                 System.out.println("=== BY CATEGORY REQUEST ===");
                 System.out.println("fromDate: " + fromDate);
                 System.out.println("toDate: " + toDate);
                 System.out.println("userIds: " + userIds);
+                System.out.println("apiKey: " + apiKey);
 
-                return repository.findAll().stream()
+                List<UserAction> actions;
+
+                // אם יש API Key, נסנן לפי האפליקציה
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        actions = repository.findByApiKey(apiKey);
+                } else {
+                        // אחרת נחזיר מפה ריקה (לא נציג נתונים ללא API Key)
+                        return new HashMap<>();
+                }
+
+                return actions.stream()
                                 .filter(action -> "click_category".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 action.getProperties().containsKey("category") &&
@@ -142,13 +174,24 @@ public class UserActionController {
                         @RequestParam String category,
                         @RequestParam(required = false) String fromDate,
                         @RequestParam(required = false) String toDate,
-                        @RequestParam(required = false) List<String> userIds) {
+                        @RequestParam(required = false) List<String> userIds,
+                        @RequestParam(required = false) String apiKey) {
+
+                List<UserAction> actions;
+
+                // אם יש API Key, נסנן לפי האפליקציה
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        actions = repository.findByApiKey(apiKey);
+                } else {
+                        // אחרת נחזיר אובייקט ריק (לא נציג נתונים ללא API Key)
+                        return new HashMap<>();
+                }
 
                 boolean hasUserFilter = userIds != null && !userIds.isEmpty();
 
                 if (!hasUserFilter) {
                         // החזר מבנה פשוט אם אין יוזרים מסוננים
-                        return repository.findAll().stream()
+                        return actions.stream()
                                         .filter(action -> "click_subcategory".equals(action.getActionName()) &&
                                                         action.getProperties() != null &&
                                                         category.equals(action.getProperties().get("category")) &&
@@ -160,7 +203,7 @@ public class UserActionController {
                 }
 
                 // אם כן יש יוזרים מסוננים — מחזיר רשימה של אובייקטים עם שדות
-                return repository.findAll().stream()
+                return actions.stream()
                                 .filter(action -> "click_subcategory".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 category.equals(action.getProperties().get("category")) &&
@@ -189,13 +232,24 @@ public class UserActionController {
                         @RequestParam(required = false) String subcategory,
                         @RequestParam(required = false) String fromDate,
                         @RequestParam(required = false) String toDate,
-                        @RequestParam(required = false) List<String> userIds) {
+                        @RequestParam(required = false) List<String> userIds,
+                        @RequestParam(required = false) String apiKey) {
+
+                List<UserAction> actions;
+
+                // אם יש API Key, נסנן לפי האפליקציה
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        actions = repository.findByApiKey(apiKey);
+                } else {
+                        // אחרת נחזיר אובייקט ריק (לא נציג נתונים ללא API Key)
+                        return new HashMap<>();
+                }
 
                 boolean hasUserFilter = userIds != null && !userIds.isEmpty();
 
                 if (!hasUserFilter) {
                         // אם אין יוזרים מסוננים – מחזיר מפת item => count
-                        return repository.findAll().stream()
+                        return actions.stream()
                                         .filter(action -> "click_item".equals(action.getActionName()) &&
                                                         action.getProperties() != null &&
                                                         category.equals(action.getProperties().get("category")) &&
@@ -208,7 +262,7 @@ public class UserActionController {
                 }
 
                 // אם יש יוזרים מסוננים – מחזיר רשימת אובייקטים עם שדות item, userId, count
-                return repository.findAll().stream()
+                return actions.stream()
                                 .filter(action -> "click_item".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 category.equals(action.getProperties().get("category")) &&
@@ -267,9 +321,20 @@ public class UserActionController {
         public List<Map<String, Object>> getCategoryCountsByUser(
                         @RequestParam(required = false) List<String> userIds,
                         @RequestParam(required = false) String fromDate,
-                        @RequestParam(required = false) String toDate) {
+                        @RequestParam(required = false) String toDate,
+                        @RequestParam(required = false) String apiKey) {
 
-                return repository.findAll().stream()
+                List<UserAction> actions;
+
+                // אם יש API Key, נסנן לפי האפליקציה
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        actions = repository.findByApiKey(apiKey);
+                } else {
+                        // אחרת נחזיר רשימה ריקה (לא נציג נתונים ללא API Key)
+                        return new ArrayList<>();
+                }
+
+                return actions.stream()
                                 .filter(action -> "click_category".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 action.getProperties().containsKey("category") &&
@@ -296,15 +361,26 @@ public class UserActionController {
         public List<Map<String, Object>> getUserActivity(
                         @PathVariable String userId,
                         @RequestParam(required = false) String fromDate,
-                        @RequestParam(required = false) String toDate) {
+                        @RequestParam(required = false) String toDate,
+                        @RequestParam(required = false) String apiKey) {
                 try {
                         System.out.println("=== USER ACTIVITY REQUEST ===");
                         System.out.println("userId: " + userId);
                         System.out.println("fromDate: " + fromDate);
                         System.out.println("toDate: " + toDate);
+                        System.out.println("apiKey: " + apiKey);
 
-                        List<UserAction> userActions = repository.findAll().stream()
-                                        .filter(action -> action.getUserId().equals(userId))
+                        List<UserAction> actions;
+
+                        // אם יש API Key, נסנן לפי משתמש ו-API Key
+                        if (apiKey != null && !apiKey.isEmpty()) {
+                                actions = repository.findByUserIdAndApiKey(userId, apiKey);
+                        } else {
+                                // אחרת נחזיר רשימה ריקה (לא נציג נתונים ללא API Key)
+                                return new ArrayList<>();
+                        }
+
+                        List<UserAction> userActions = actions.stream()
                                         .filter(action -> isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
                                         .sorted(Comparator.comparing(UserAction::getTimestamp).reversed())
                                         .collect(Collectors.toList());
@@ -330,8 +406,18 @@ public class UserActionController {
         }
 
         @GetMapping("/user-actions/users")
-        public List<String> getAllUserIds() {
-                return repository.findAll().stream()
+        public List<String> getAllUserIds(@RequestParam(required = false) String apiKey) {
+                List<UserAction> actions;
+
+                // אם יש API Key, נסנן לפי האפליקציה
+                if (apiKey != null && !apiKey.isEmpty()) {
+                        actions = repository.findByApiKey(apiKey);
+                } else {
+                        // אחרת נחזיר רשימה ריקה (לא נציג נתונים ללא API Key)
+                        return new ArrayList<>();
+                }
+
+                return actions.stream()
                                 .map(UserAction::getUserId)
                                 .distinct()
                                 .sorted()

@@ -27,6 +27,7 @@ import retrofit2.Response;
 public class AnalyticsTracker {
 
     private static String BASE_URL = "http://192.168.7.7:8080/"; // Default base URL
+    private static String API_KEY = null; // API Key של האפליקציה
 
     private static String currentScreen = null;
     private static long screenEnterTime = 0;
@@ -36,14 +37,30 @@ public class AnalyticsTracker {
         BASE_URL = baseUrl;
     }
 
+    // אתחול API Key
+    public static void setApiKey(String apiKey) {
+        API_KEY = apiKey;
+    }
+
+    // אתחול מלא עם כתובת ו-API Key
+    public static void init(String baseUrl, String apiKey) {
+        BASE_URL = baseUrl;
+        API_KEY = apiKey;
+    }
+
     // שליחת פעולה (event) לשרת
     public static void trackEvent(String userId, String actionName, Map<String, Object> properties) {
+        if (API_KEY == null) {
+            Log.e("AnalyticsTracker", "API Key not set. Call setApiKey() or init() with API Key first.");
+            return;
+        }
+
         String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date());
 
         ActionEvent event = new ActionEvent(userId, actionName, timestamp, properties);
         TrackerApi api = ApiClient.getClient(BASE_URL).create(TrackerApi.class);
 
-        Call<Void> call = api.sendEvent(event);
+        Call<Void> call = api.sendEvent(event, API_KEY);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
@@ -94,6 +111,11 @@ public class AnalyticsTracker {
 
     // שליחת זמן מסך ל-collection נפרד
     public static void trackScreenTime(String userId, String screenName, long startTimeMillis, long endTimeMillis, long durationMillis) {
+        if (API_KEY == null) {
+            Log.e("AnalyticsTracker", "API Key not set. Call setApiKey() or init() with API Key first.");
+            return;
+        }
+
         String startTimeStr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date(startTimeMillis));
         String endTimeStr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date(endTimeMillis));
 
@@ -102,7 +124,7 @@ public class AnalyticsTracker {
         );
 
         ScreenTimeApi api = ApiClient.getClient(BASE_URL).create(ScreenTimeApi.class);
-        Call<Void> call = api.trackScreenTime(screenTime);
+        Call<Void> call = api.trackScreenTime(screenTime, API_KEY);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
@@ -118,8 +140,13 @@ public class AnalyticsTracker {
 
     // רישום משתמש
     public static void signupUser(User user, Callback<Void> callback) {
+        if (API_KEY == null) {
+            Log.e("AnalyticsTracker", "API Key not set. Call setApiKey() or init() with API Key first.");
+            return;
+        }
+
         UserApi userApi = ApiClient.getClient(BASE_URL).create(UserApi.class);
-        Call<Void> call = userApi.registerUser(user);
+        Call<Void> call = userApi.registerUser(user, API_KEY);
         call.enqueue(callback);
     }
 

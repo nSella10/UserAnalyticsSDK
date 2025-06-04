@@ -18,16 +18,48 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
   const fetchApps = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8080/apps/my-apps?developerEmail=${developer.email}`);
+      setError(''); // איפוס שגיאות קודמות
+
+      // קבלת JWT token מ-localStorage
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setError('לא נמצא token. אנא התחבר מחדש.');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('🔍 Fetching apps with token:', token.substring(0, 20) + '...');
+      console.log('🌐 Making request to:', `http://localhost:8080/apps/my-apps`);
+
+      const response = await fetch(`http://localhost:8080/apps/my-apps`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', response.headers);
 
       if (response.ok) {
         const data = await response.json();
-        setApps(data);
+        console.log('✅ Apps loaded:', data);
+        setApps(Array.isArray(data) ? data : []);
+        setError(''); // איפוס שגיאות אם הכל בסדר
+      } else if (response.status === 401) {
+        setError('פג תוקף ההתחברות. אנא התחבר מחדש.');
+        // ניקוי localStorage אם יש בעיית authentication
+        localStorage.removeItem('token');
+        localStorage.removeItem('developer');
       } else {
-        setError('שגיאה בטעינת האפליקציות');
+        const errorText = await response.text();
+        console.error('❌ Server error:', response.status, errorText);
+        setError(`שגיאה בטעינת האפליקציות (${response.status})`);
       }
     } catch (err) {
-      setError('שגיאה בחיבור לשרת');
+      console.error('❌ Network error:', err);
+      setError('שגיאה בחיבור לשרת. אנא בדוק שהשרת פועל.');
     } finally {
       setIsLoading(false);
     }
@@ -44,15 +76,23 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
     }
 
     try {
+      // קבלת JWT token מ-localStorage
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setError('לא נמצא token. אנא התחבר מחדש.');
+        return;
+      }
+
       const response = await fetch('http://localhost:8080/apps/create', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           appName: newApp.appName,
-          description: newApp.description,
-          developerEmail: developer.email
+          description: newApp.description
         }),
       });
 
@@ -63,10 +103,13 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
         setNewApp({ appName: '', description: '' });
         setShowCreateForm(false);
         fetchApps(); // רענון רשימת האפליקציות
+      } else if (response.status === 401) {
+        setError('פג תוקף ההתחברות. אנא התחבר מחדש.');
       } else {
         setError(data.error || 'שגיאה ביצירת האפליקציה');
       }
     } catch (err) {
+      console.error('Error creating app:', err);
       setError('שגיאה בחיבור לשרת');
     }
   };
@@ -99,7 +142,29 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp }) => {
         {/* Messages */}
         {error && (
           <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            {error}
+            <div className="flex items-center justify-between">
+              <span>{error}</span>
+              <div className="space-x-2 space-x-reverse">
+                <button
+                  onClick={fetchApps}
+                  disabled={isLoading}
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? 'טוען...' : 'נסה שוב'}
+                </button>
+                {error.includes('token') && (
+                  <button
+                    onClick={() => {
+                      localStorage.clear();
+                      window.location.reload();
+                    }}
+                    className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
+                  >
+                    התחבר מחדש
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         )}
         {success && (

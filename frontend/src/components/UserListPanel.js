@@ -9,8 +9,19 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger }) {
   useEffect(() => {
     setIsLoading(true);
 
-    // זמנית - נשלח בקשה בלי API Key
-    fetch("http://localhost:8080/track/stats/all-users")
+    // קבלת האפליקציה הנבחרת מ-localStorage
+    const selectedApp = JSON.parse(localStorage.getItem('selectedApp') || '{}');
+    const apiKey = selectedApp.apiKey;
+
+    if (!apiKey) {
+      console.error("No API key found");
+      setUsers([]);
+      setIsLoading(false);
+      return;
+    }
+
+    // שליחת בקשה עם API Key
+    fetch(`http://localhost:8080/track/stats/all-users?apiKey=${apiKey}`)
       .then(res => res.json())
       .then(data => {
         setUsers(Array.isArray(data) ? data : []);

@@ -23,11 +23,19 @@ public class ScreenTimeController {
 
     // שמירת זמן מסך חדש
     @PostMapping("/save")
-    public ResponseEntity<ScreenTime> saveScreenTime(@RequestBody ScreenTime screenTime) {
+    public ResponseEntity<ScreenTime> saveScreenTime(@RequestBody ScreenTime screenTime, @RequestParam(required = false) String apiKey) {
         try {
             if (screenTime.getTimestamp() == null) {
                 screenTime.setTimestamp(LocalDateTime.now());
             }
+
+            // הוספת API Key לזמן המסך
+            if (apiKey != null && !apiKey.isEmpty()) {
+                screenTime.setApiKey(apiKey);
+            } else {
+                return ResponseEntity.status(400).body(null); // Missing API Key
+            }
+
             ScreenTime saved = screenTimeRepository.save(screenTime);
             System.out.println("✅ Screen time saved: " + saved);
             return ResponseEntity.ok(saved);
@@ -53,9 +61,20 @@ public class ScreenTimeController {
 
     // קבלת זמני מסך לפי משתמש
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ScreenTime>> getScreenTimesByUser(@PathVariable String userId) {
+    public ResponseEntity<List<ScreenTime>> getScreenTimesByUser(
+            @PathVariable String userId,
+            @RequestParam(required = false) String apiKey) {
         try {
-            List<ScreenTime> screenTimes = screenTimeRepository.findByUserId(userId);
+            List<ScreenTime> screenTimes;
+
+            // אם יש API Key, נסנן לפי משתמש ו-API Key
+            if (apiKey != null && !apiKey.isEmpty()) {
+                screenTimes = screenTimeRepository.findByUserIdAndApiKey(userId, apiKey);
+            } else {
+                // אחרת נחזיר רשימה ריקה (לא נציג נתונים ללא API Key)
+                return ResponseEntity.ok(new ArrayList<>());
+            }
+
             return ResponseEntity.ok(screenTimes);
         } catch (Exception e) {
             System.err.println("❌ Error getting screen times for user: " + e.getMessage());
@@ -163,14 +182,24 @@ public class ScreenTimeController {
     public ResponseEntity<List<Map<String, Object>>> getUserScreenTime(
             @PathVariable String userId,
             @RequestParam(required = false) String fromDate,
-            @RequestParam(required = false) String toDate) {
+            @RequestParam(required = false) String toDate,
+            @RequestParam(required = false) String apiKey) {
         try {
             System.out.println("=== USER SCREEN TIME REQUEST ===");
             System.out.println("userId: " + userId);
             System.out.println("fromDate: " + fromDate);
             System.out.println("toDate: " + toDate);
+            System.out.println("apiKey: " + apiKey);
 
-            List<ScreenTime> screenTimes = screenTimeRepository.findByUserId(userId);
+            List<ScreenTime> screenTimes;
+
+            // אם יש API Key, נסנן לפי משתמש ו-API Key
+            if (apiKey != null && !apiKey.isEmpty()) {
+                screenTimes = screenTimeRepository.findByUserIdAndApiKey(userId, apiKey);
+            } else {
+                // אחרת נחזיר רשימה ריקה (לא נציג נתונים ללא API Key)
+                return ResponseEntity.ok(new ArrayList<>());
+            }
 
             // פילטר לפי תאריכים אם נדרש
             if (fromDate != null && toDate != null) {
@@ -228,14 +257,24 @@ public class ScreenTimeController {
     public ResponseEntity<Map<String, Object>> getUserScreenSummary(
             @PathVariable String userId,
             @RequestParam(required = false) String fromDate,
-            @RequestParam(required = false) String toDate) {
+            @RequestParam(required = false) String toDate,
+            @RequestParam(required = false) String apiKey) {
         try {
             System.out.println("=== USER SCREEN SUMMARY REQUEST ===");
             System.out.println("userId: " + userId);
             System.out.println("fromDate: " + fromDate);
             System.out.println("toDate: " + toDate);
+            System.out.println("apiKey: " + apiKey);
 
-            List<ScreenTime> screenTimes = screenTimeRepository.findByUserId(userId);
+            List<ScreenTime> screenTimes;
+
+            // אם יש API Key, נסנן לפי משתמש ו-API Key
+            if (apiKey != null && !apiKey.isEmpty()) {
+                screenTimes = screenTimeRepository.findByUserIdAndApiKey(userId, apiKey);
+            } else {
+                // אחרת נחזיר מפה ריקה (לא נציג נתונים ללא API Key)
+                return ResponseEntity.ok(new HashMap<>());
+            }
 
             // פילטר לפי תאריכים אם נדרש
             if (fromDate != null && toDate != null) {

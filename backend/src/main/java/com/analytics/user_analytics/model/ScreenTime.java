@@ -25,6 +25,7 @@ public class ScreenTime {
 
     private long duration; // משך הזמן במילישניות
     private String sessionId; // מזהה סשן (אופציונלי)
+    private String apiKey; // API Key של האפליקציה שיצרה את זמן המסך
 
     // קונסטרקטורים
     public ScreenTime() {
@@ -114,6 +115,14 @@ public class ScreenTime {
         this.sessionId = sessionId;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
     @Override
     public String toString() {
         return "ScreenTime{" +
@@ -125,6 +134,7 @@ public class ScreenTime {
                 ", timestamp=" + timestamp +
                 ", duration=" + duration +
                 ", sessionId='" + sessionId + '\'' +
+                ", apiKey='" + apiKey + '\'' +
                 '}';
     }
 }

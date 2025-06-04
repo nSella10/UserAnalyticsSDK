@@ -45,8 +45,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle("My Interests");
 
-        // Initialize the AnalyticsTracker with the server URL
-        AnalyticsTracker.init("http://192.168.7.7:8080/");
+        // Initialize the AnalyticsTracker with the server URL and API Key
+        // TODO: Replace with your actual API Key from the dashboard
+        String apiKey = "ak_827aeb412aed4b23b8260432"; // API Key של האפליקציה
+        AnalyticsTracker.init("http://192.168.7.7:8080/", apiKey);
 
 
 

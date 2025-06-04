@@ -9,10 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"})
+@CrossOrigin(origins = {"http://localhost:3000"})
 @RestController
 @RequestMapping("/apps")
 public class AppController {
@@ -27,32 +28,32 @@ public class AppController {
      * יצירת אפליקציה חדשה
      */
     @PostMapping("/create")
-    public ResponseEntity<?> createApp(@RequestBody CreateAppRequest request) {
+    public ResponseEntity<?> createApp(@RequestBody CreateAppRequest request, HttpServletRequest httpRequest) {
         try {
             System.out.println("🔧 Creating new app: " + request.getAppName());
 
-            // בדיקת קיום המפתח לפי ID במקום API Key
-            Developer developer = developerService.findByEmail(request.getDeveloperEmail());
+            // קבלת המפתח מה-JWT token (מה-filter)
+            Developer developer = (Developer) httpRequest.getAttribute("developer");
             if (developer == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid developer"));
+                    .body(Map.of("error", "Authentication required"));
             }
-            
+
             // יצירת האפליקציה
             App app = appService.createApp(
                 request.getAppName(),
                 developer.getId(),
                 request.getDescription()
             );
-            
+
             System.out.println("✅ App created successfully: " + app.getApiKey());
-            
+
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "app", app,
                 "message", "App created successfully"
             ));
-            
+
         } catch (Exception e) {
             System.out.println("💥 Error creating app: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -64,20 +65,20 @@ public class AppController {
      * קבלת כל האפליקציות של מפתח
      */
     @GetMapping("/my-apps")
-    public ResponseEntity<?> getMyApps(@RequestParam String developerEmail) {
+    public ResponseEntity<?> getMyApps(HttpServletRequest httpRequest) {
         try {
-            // בדיקת קיום המפתח
-            Developer developer = developerService.findByEmail(developerEmail);
+            // קבלת המפתח מה-JWT token (מה-filter)
+            Developer developer = (Developer) httpRequest.getAttribute("developer");
             if (developer == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Invalid developer"));
+                    .body(Map.of("error", "Authentication required"));
             }
-            
+
             // קבלת האפליקציות
             List<App> apps = appService.getAppsByDeveloper(developer.getId());
-            
+
             return ResponseEntity.ok(apps);
-            
+
         } catch (Exception e) {
             System.out.println("💥 Error getting apps: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -132,7 +133,6 @@ public class AppController {
     public static class CreateAppRequest {
         private String appName;
         private String description;
-        private String developerEmail;
 
         // Getters and Setters
         public String getAppName() { return appName; }
@@ -140,9 +140,6 @@ public class AppController {
 
         public String getDescription() { return description; }
         public void setDescription(String description) { this.description = description; }
-
-        public String getDeveloperEmail() { return developerEmail; }
-        public void setDeveloperEmail(String developerEmail) { this.developerEmail = developerEmail; }
     }
     
     public static class UpdateAppRequest {

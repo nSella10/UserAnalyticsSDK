@@ -12,7 +12,7 @@ import retrofit2.http.Query;
 
 public interface UserApi {
     @POST("users/register")
-    Call<Void> registerUser(@Body User user);
+    Call<Void> registerUser(@Body User user, @Query("apiKey") String apiKey);
 
     @POST("users/login")
     Call<AuthResponse> loginUser(@Body LoginRequest request);
