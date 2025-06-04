@@ -14,6 +14,8 @@ public class User {
     private String password;
     private int age;
     private Gender gender;
+    private String apiKey;
+    private String appId;
 
     // Constructor (send data to backend)
     public User(String id,String firstName, String lastName,int age, Gender gender,String email, String password) {
@@ -83,5 +85,21 @@ public class User {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 }

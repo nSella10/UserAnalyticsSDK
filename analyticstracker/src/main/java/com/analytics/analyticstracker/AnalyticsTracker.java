@@ -27,20 +27,33 @@ import retrofit2.Response;
 public class AnalyticsTracker {
 
     private static String BASE_URL = "http://192.168.7.7:8080/"; // Default base URL
+    private static String API_KEY = null; // API Key של האפליקציה
 
     private static String currentScreen = null;
     private static long screenEnterTime = 0;
 
-    // אתחול כתובת ה-API
-    public static void init(String baseUrl) {
+    // אתחול כתובת ה-API ו-API Key
+    public static void init(String baseUrl, String apiKey) {
         BASE_URL = baseUrl;
+        API_KEY = apiKey;
+        Log.d("AnalyticsTracker", "🔗 Initialized with BASE_URL: " + BASE_URL + " and API_KEY: " + apiKey);
+    }
+
+    // אתחול עם API Key בלבד (שימוש ב-URL ברירת מחדל)
+    public static void init(String apiKey) {
+        API_KEY = apiKey;
     }
 
     // שליחת פעולה (event) לשרת
     public static void trackEvent(String userId, String actionName, Map<String, Object> properties) {
+        if (API_KEY == null) {
+            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+            return;
+        }
+
         String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date());
 
-        ActionEvent event = new ActionEvent(userId, actionName, timestamp, properties);
+        ActionEvent event = new ActionEvent(userId, actionName, timestamp, properties, API_KEY);
         TrackerApi api = ApiClient.getClient(BASE_URL).create(TrackerApi.class);
 
         Call<Void> call = api.sendEvent(event);
@@ -87,26 +100,35 @@ public class AnalyticsTracker {
         trackEvent(userId, "screen_duration", props);
 
         // איפוס
-        Log.d("AnalyticsTracker", "Ended tracking screen: " + currentScreen + " | Duration: " + durationSeconds + " seconds");
+        Log.d("AnalyticsTracker",
+                "Ended tracking screen: " + currentScreen + " | Duration: " + durationSeconds + " seconds");
         currentScreen = null;
         screenEnterTime = 0;
     }
 
     // שליחת זמן מסך ל-collection נפרד
-    public static void trackScreenTime(String userId, String screenName, long startTimeMillis, long endTimeMillis, long durationMillis) {
-        String startTimeStr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date(startTimeMillis));
-        String endTimeStr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date(endTimeMillis));
+    public static void trackScreenTime(String userId, String screenName, long startTimeMillis, long endTimeMillis,
+            long durationMillis) {
+        String startTimeStr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                .format(new Date(startTimeMillis));
+        String endTimeStr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                .format(new Date(endTimeMillis));
+
+        if (API_KEY == null) {
+            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+            return;
+        }
 
         com.analytics.analyticstracker.model.ScreenTime screenTime = new com.analytics.analyticstracker.model.ScreenTime(
-                userId, screenName, durationMillis, startTimeStr, endTimeStr
-        );
+                userId, screenName, durationMillis, startTimeStr, endTimeStr, null, API_KEY);
 
         ScreenTimeApi api = ApiClient.getClient(BASE_URL).create(ScreenTimeApi.class);
         Call<Void> call = api.trackScreenTime(screenTime);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                Log.d("AnalyticsTracker", "✅ Screen time sent successfully: " + screenName + " (" + durationMillis + "ms)");
+                Log.d("AnalyticsTracker",
+                        "✅ Screen time sent successfully: " + screenName + " (" + durationMillis + "ms)");
             }
 
             @Override
@@ -118,6 +140,15 @@ public class AnalyticsTracker {
 
     // רישום משתמש
     public static void signupUser(User user, Callback<Void> callback) {
+        if (API_KEY == null) {
+            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+            return;
+        }
+
+        // הוספת API Key למשתמש
+        user.setApiKey(API_KEY);
+        Log.d("AnalyticsTracker", "🔐 Registering user with API_KEY: " + API_KEY);
+
         UserApi userApi = ApiClient.getClient(BASE_URL).create(UserApi.class);
         Call<Void> call = userApi.registerUser(user);
         call.enqueue(callback);
@@ -125,6 +156,7 @@ public class AnalyticsTracker {
 
     // התחברות משתמש
     public static void loginUser(LoginRequest request, Callback<AuthResponse> callback) {
+        Log.d("AnalyticsTracker", "🔐 Attempting login with BASE_URL: " + BASE_URL);
         UserApi userApi = ApiClient.getClient(BASE_URL).create(UserApi.class);
         Call<AuthResponse> call = userApi.loginUser(request);
         call.enqueue(callback);

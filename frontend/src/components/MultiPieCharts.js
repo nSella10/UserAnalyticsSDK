@@ -26,7 +26,7 @@ const LoadingIndicator = () => (
     </div>
 );
 
-function MultiPieCharts({ selectedUsers }) {
+function MultiPieCharts({ selectedUsers, selectedApp }) {
     const [categoryData, setCategoryData] = useState([]);
     const [subcategoryData, setSubcategoryData] = useState([]);
     const [itemData, setItemData] = useState([]);
@@ -42,7 +42,9 @@ function MultiPieCharts({ selectedUsers }) {
 
     // שליפת שמות המשתמשים
     useEffect(() => {
-        fetch("http://localhost:8080/track/stats/all-users")
+        if (!selectedApp || !selectedApp.apiKey) return;
+
+        fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
             .then(res => res.json())
             .then(users => {
                 const map = {};
@@ -52,10 +54,12 @@ function MultiPieCharts({ selectedUsers }) {
                 setUsersMap(map);
             })
             .catch(console.error);
-    }, []);
+    }, [selectedApp]);
 
     // שליפת נתוני קטגוריות
     useEffect(() => {
+        if (!selectedApp || !selectedApp.apiKey) return;
+
         setLoading(prev => ({ ...prev, category: true }));
         const params = new URLSearchParams();
         if (selectedUsers && selectedUsers.length > 0) {
@@ -64,6 +68,7 @@ function MultiPieCharts({ selectedUsers }) {
 
         // הוספת פרמטרים של טווח זמן
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+        params.append('apiKey', selectedApp.apiKey);
 
         fetch(`http://localhost:8080/track/stats/by-category?${params}`)
             .then(res => res.json())
@@ -90,11 +95,11 @@ function MultiPieCharts({ selectedUsers }) {
                 console.error(err);
                 setLoading(prev => ({ ...prev, category: false }));
             });
-    }, [selectedUsers, timeRange]);
+    }, [selectedUsers, timeRange, selectedApp]);
 
     // שליפת נתוני תת-קטגוריות - רק כשיש קטגוריה נבחרת
     useEffect(() => {
-        if (!selectedCategory) {
+        if (!selectedCategory || !selectedApp || !selectedApp.apiKey) {
             setSubcategoryData([]);
             setTotals(prev => ({ ...prev, subcategory: 0 }));
             setLoading(prev => ({ ...prev, subcategory: false }));
@@ -115,6 +120,7 @@ function MultiPieCharts({ selectedUsers }) {
 
         // הוספת פרמטרים של טווח זמן
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+        params.append('apiKey', selectedApp.apiKey);
 
         fetch(`http://localhost:8080/track/stats/by-subcategory?${params}`)
             .then(res => res.json())
@@ -165,11 +171,11 @@ function MultiPieCharts({ selectedUsers }) {
                 console.error(err);
                 setLoading(prev => ({ ...prev, subcategory: false }));
             });
-    }, [selectedCategory, selectedUsers, timeRange]);
+    }, [selectedCategory, selectedUsers, timeRange, selectedApp]);
 
     // שליפת נתוני פריטים - רק כשיש קטגוריה ותת-קטגוריה נבחרות
     useEffect(() => {
-        if (!selectedCategory || !selectedSubcategory) {
+        if (!selectedCategory || !selectedSubcategory || !selectedApp || !selectedApp.apiKey) {
             setItemData([]);
             setTotals(prev => ({ ...prev, item: 0 }));
             setLoading(prev => ({ ...prev, item: false }));
@@ -192,6 +198,7 @@ function MultiPieCharts({ selectedUsers }) {
 
         // הוספת פרמטרים של טווח זמן
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+        params.append('apiKey', selectedApp.apiKey);
 
         fetch(`http://localhost:8080/track/stats/by-item?${params}`)
             .then(res => res.json())
@@ -231,7 +238,7 @@ function MultiPieCharts({ selectedUsers }) {
                 console.error(err);
                 setLoading(prev => ({ ...prev, item: false }));
             });
-    }, [selectedCategory, selectedSubcategory, selectedUsers, timeRange]);
+    }, [selectedCategory, selectedSubcategory, selectedUsers, timeRange, selectedApp]);
 
     // פונקציה לרינדור תוויות בתוך הפאי
     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {

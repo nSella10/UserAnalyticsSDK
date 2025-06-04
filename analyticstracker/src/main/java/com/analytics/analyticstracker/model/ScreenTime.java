@@ -7,9 +7,11 @@ public class ScreenTime {
     private String startTime;
     private String endTime;
     private String sessionId; // מזהה סשן (אופציונלי)
+    private String apiKey; // API Key של האפליקציה
 
     // Constructors
-    public ScreenTime() {}
+    public ScreenTime() {
+    }
 
     public ScreenTime(String userId, String screenName, long duration, String startTime, String endTime) {
         this.userId = userId;
@@ -19,13 +21,25 @@ public class ScreenTime {
         this.endTime = endTime;
     }
 
-    public ScreenTime(String userId, String screenName, long duration, String startTime, String endTime, String sessionId) {
+    public ScreenTime(String userId, String screenName, long duration, String startTime, String endTime,
+            String sessionId) {
         this.userId = userId;
         this.screenName = screenName;
         this.duration = duration;
         this.startTime = startTime;
         this.endTime = endTime;
         this.sessionId = sessionId;
+    }
+
+    public ScreenTime(String userId, String screenName, long duration, String startTime, String endTime,
+            String sessionId, String apiKey) {
+        this.userId = userId;
+        this.screenName = screenName;
+        this.duration = duration;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.sessionId = sessionId;
+        this.apiKey = apiKey;
     }
 
     // Getters and Setters
@@ -75,6 +89,14 @@ public class ScreenTime {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     @Override

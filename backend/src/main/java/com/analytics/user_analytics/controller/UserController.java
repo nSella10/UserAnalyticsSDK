@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.analytics.user_analytics.dto.AuthResponse;
 import com.analytics.user_analytics.dto.LoginRequest;
 import com.analytics.user_analytics.model.User;
+import com.analytics.user_analytics.model.App;
 import com.analytics.user_analytics.repository.UserRepository;
+import com.analytics.user_analytics.repository.AppRepository;
 import com.analytics.user_analytics.security.JwtUtil;
 import com.analytics.user_analytics.dto.UpdateNameRequest;
 
@@ -34,6 +36,9 @@ public class UserController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private AppRepository appRepository;
+
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody User user) {
@@ -44,8 +49,20 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
             }
 
+            // אם יש API Key, מצא את האפליקציה ושייך את המשתמש אליה
+            if (user.getApiKey() != null) {
+                App app = appRepository.findByApiKey(user.getApiKey());
+                if (app != null) {
+                    user.setAppId(app.getId());
+                    System.out.println("✅ User linked to app: " + app.getAppName() + " (ID: " + app.getId() + ")");
+                } else {
+                    System.out.println("⚠️ App not found for API Key: " + user.getApiKey());
+                }
+            }
+
             user.setRegisterAt(LocalDateTime.now());
             userRepository.save(user);
+            System.out.println("✅ User registered: " + user.getEmail() + " with API Key: " + user.getApiKey());
             return ResponseEntity.ok("User registered successfully");
         } catch (Exception e) {
             e.printStackTrace();

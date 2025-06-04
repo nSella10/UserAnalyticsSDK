@@ -24,6 +24,7 @@ public class User {
     private Gender gender;
     private LocalDateTime registerAt;
     private String apiKey; // API Key של המפתח שיצר את המשתמש
+    private String appId; // ID של האפליקציה שהמשתמש שייך אליה
 
     // Default constructor
     public User() {}
@@ -67,4 +68,7 @@ public class User {
 
     public String getApiKey() { return apiKey; }
     public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+
+    public String getAppId() { return appId; }
+    public void setAppId(String appId) { this.appId = appId; }
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"})
+@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:3001", "http://localhost:3002" })
 @RestController
 @RequestMapping("/track")
 public class UserActionController {
@@ -29,6 +29,9 @@ public class UserActionController {
         public String trackUserAction(@RequestBody UserAction action) {
                 if (action.getUserId() == null || action.getActionName() == null) {
                         return "Missing userId or actionName";
+                }
+                if (action.getApiKey() == null || action.getApiKey().trim().isEmpty()) {
+                        return "Missing API Key";
                 }
                 if (action.getTimestamp() == null) {
                         action.setTimestamp(LocalDateTime.now());
@@ -51,18 +54,19 @@ public class UserActionController {
         }
 
         @GetMapping("/stats/all-users")
-        public List<User> getAllUsers(HttpServletRequest request) {
-                // קבלת המפתח מה-request
-                Developer developer = (Developer) request.getAttribute("developer");
-                if (developer == null) {
-                        return new ArrayList<>(); // החזרת רשימה ריקה אם אין הרשאה
+        public List<User> getAllUsers(@RequestParam(required = false) String apiKey, HttpServletRequest request) {
+                if (apiKey == null || apiKey.trim().isEmpty()) {
+                        System.out.println("❌ Missing API Key in getAllUsers request");
+                        return new ArrayList<>();
                 }
 
-                // זמנית - החזרת כל המשתמשים (עד שנעדכן את מודל User)
-                List<User> allUsers = userRepository.findAll();
+                System.out.println("🔍 Getting users for API Key: " + apiKey);
 
-                // בעתיד נסנן לפי API Key של האפליקציה הנבחרת
-                return allUsers;
+                // סינון משתמשים לפי API Key (שמור לתאימות לאחור) ו-appId
+                List<User> filteredUsers = userRepository.findByApiKey(apiKey);
+
+                System.out.println("✅ Found " + filteredUsers.size() + " users for API Key: " + apiKey);
+                return filteredUsers;
         }
 
         @GetMapping("/stats/by-date")
@@ -94,21 +98,25 @@ public class UserActionController {
         public List<UserAction> getUserLogs(
                         @RequestParam String userId,
                         @RequestParam(required = false) String fromDate,
-                        @RequestParam(required = false) String toDate) {
+                        @RequestParam(required = false) String toDate,
+                        @RequestParam(required = false) String apiKey) {
 
                 System.out.println("=== USER LOGS REQUEST ===");
                 System.out.println("userId: " + userId);
                 System.out.println("fromDate: " + fromDate);
                 System.out.println("toDate: " + toDate);
+                System.out.println("apiKey: " + apiKey);
 
                 List<UserAction> actions = repository.findAll();
                 List<UserAction> filteredActions = actions.stream()
                                 .filter(action -> action.getUserId().equals(userId))
                                 .filter(action -> isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
+                                .filter(action -> apiKey == null || apiKey.equals(action.getApiKey()))
                                 .sorted(Comparator.comparing(UserAction::getTimestamp).reversed())
                                 .collect(Collectors.toList());
 
-                System.out.println("Found " + filteredActions.size() + " actions for user " + userId);
+                System.out.println("Found " + filteredActions.size() + " actions for user " + userId + " with API Key: "
+                                + apiKey);
                 return filteredActions;
         }
 
@@ -116,12 +124,14 @@ public class UserActionController {
         public Map<String, Long> getClicksByCategory(
                         @RequestParam(required = false) String fromDate,
                         @RequestParam(required = false) String toDate,
-                        @RequestParam(required = false) List<String> userIds) {
+                        @RequestParam(required = false) List<String> userIds,
+                        @RequestParam(required = false) String apiKey) {
 
                 System.out.println("=== BY CATEGORY REQUEST ===");
                 System.out.println("fromDate: " + fromDate);
                 System.out.println("toDate: " + toDate);
                 System.out.println("userIds: " + userIds);
+                System.out.println("apiKey: " + apiKey);
 
                 return repository.findAll().stream()
                                 .filter(action -> "click_category".equals(action.getActionName()) &&
@@ -129,20 +139,21 @@ public class UserActionController {
                                                 action.getProperties().containsKey("category") &&
                                                 isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                 (userIds == null || userIds.isEmpty()
-                                                                || userIds.contains(action.getUserId())))
+                                                                || userIds.contains(action.getUserId()))
+                                                &&
+                                                (apiKey == null || apiKey.equals(action.getApiKey())))
                                 .collect(Collectors.groupingBy(
                                                 action -> action.getProperties().get("category").toString(),
                                                 Collectors.counting()));
         }
-
-
 
         @GetMapping("/stats/by-subcategory")
         public Object getClicksBySubcategory(
                         @RequestParam String category,
                         @RequestParam(required = false) String fromDate,
                         @RequestParam(required = false) String toDate,
-                        @RequestParam(required = false) List<String> userIds) {
+                        @RequestParam(required = false) List<String> userIds,
+                        @RequestParam(required = false) String apiKey) {
 
                 boolean hasUserFilter = userIds != null && !userIds.isEmpty();
 
@@ -153,7 +164,8 @@ public class UserActionController {
                                                         action.getProperties() != null &&
                                                         category.equals(action.getProperties().get("category")) &&
                                                         action.getProperties().containsKey("subcategory") &&
-                                                        isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
+                                                        isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
+                                                        (apiKey == null || apiKey.equals(action.getApiKey())))
                                         .collect(Collectors.groupingBy(
                                                         action -> action.getProperties().get("subcategory").toString(),
                                                         Collectors.counting()));
@@ -166,7 +178,8 @@ public class UserActionController {
                                                 category.equals(action.getProperties().get("category")) &&
                                                 action.getProperties().containsKey("subcategory") &&
                                                 isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
-                                                userIds.contains(action.getUserId()))
+                                                userIds.contains(action.getUserId()) &&
+                                                (apiKey == null || apiKey.equals(action.getApiKey())))
                                 .collect(Collectors.groupingBy(
                                                 action -> Map.of(
                                                                 "subcategory",
@@ -182,14 +195,14 @@ public class UserActionController {
                                 .collect(Collectors.toList());
         }
 
-
         @GetMapping("/stats/by-item")
         public Object getClicksByItem(
                         @RequestParam String category,
                         @RequestParam(required = false) String subcategory,
                         @RequestParam(required = false) String fromDate,
                         @RequestParam(required = false) String toDate,
-                        @RequestParam(required = false) List<String> userIds) {
+                        @RequestParam(required = false) List<String> userIds,
+                        @RequestParam(required = false) String apiKey) {
 
                 boolean hasUserFilter = userIds != null && !userIds.isEmpty();
 
@@ -199,9 +212,12 @@ public class UserActionController {
                                         .filter(action -> "click_item".equals(action.getActionName()) &&
                                                         action.getProperties() != null &&
                                                         category.equals(action.getProperties().get("category")) &&
-                                                        (subcategory == null || subcategory.equals(action.getProperties().get("subcategory"))) &&
+                                                        (subcategory == null || subcategory.equals(
+                                                                        action.getProperties().get("subcategory")))
+                                                        &&
                                                         action.getProperties().containsKey("item") &&
-                                                        isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
+                                                        isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
+                                                        (apiKey == null || apiKey.equals(action.getApiKey())))
                                         .collect(Collectors.groupingBy(
                                                         action -> action.getProperties().get("item").toString(),
                                                         Collectors.counting()));
@@ -212,10 +228,13 @@ public class UserActionController {
                                 .filter(action -> "click_item".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
                                                 category.equals(action.getProperties().get("category")) &&
-                                                (subcategory == null || subcategory.equals(action.getProperties().get("subcategory"))) &&
+                                                (subcategory == null || subcategory
+                                                                .equals(action.getProperties().get("subcategory")))
+                                                &&
                                                 action.getProperties().containsKey("item") &&
                                                 isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
-                                                userIds.contains(action.getUserId()))
+                                                userIds.contains(action.getUserId()) &&
+                                                (apiKey == null || apiKey.equals(action.getApiKey())))
                                 .collect(Collectors.groupingBy(
                                                 action -> Map.of(
                                                                 "item", action.getProperties().get("item").toString(),
@@ -233,9 +252,9 @@ public class UserActionController {
         private boolean isInDateRange(LocalDateTime timestamp, String fromDate, String toDate) {
                 if (fromDate == null || toDate == null)
                         return true;
-//                LocalDateTime from = LocalDateTime.parse(fromDate);
-//                LocalDateTime to = LocalDateTime.parse(toDate);
-//                return !timestamp.isBefore(from) && !timestamp.isAfter(to);
+                // LocalDateTime from = LocalDateTime.parse(fromDate);
+                // LocalDateTime to = LocalDateTime.parse(toDate);
+                // return !timestamp.isBefore(from) && !timestamp.isAfter(to);
                 try {
                         // ניקוי פורמט: הסרת Z או +00:00 אם קיימים
                         String cleanFrom = fromDate.replace("Z", "").replace("+00:00", "");
@@ -267,7 +286,8 @@ public class UserActionController {
         public List<Map<String, Object>> getCategoryCountsByUser(
                         @RequestParam(required = false) List<String> userIds,
                         @RequestParam(required = false) String fromDate,
-                        @RequestParam(required = false) String toDate) {
+                        @RequestParam(required = false) String toDate,
+                        @RequestParam(required = false) String apiKey) {
 
                 return repository.findAll().stream()
                                 .filter(action -> "click_category".equals(action.getActionName()) &&
@@ -275,7 +295,9 @@ public class UserActionController {
                                                 action.getProperties().containsKey("category") &&
                                                 isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                 (userIds == null || userIds.isEmpty()
-                                                                || userIds.contains(action.getUserId())))
+                                                                || userIds.contains(action.getUserId()))
+                                                &&
+                                                (apiKey == null || apiKey.equals(action.getApiKey())))
                                 .collect(Collectors.groupingBy(
                                                 action -> Map.of(
                                                                 "category",
@@ -349,7 +371,8 @@ public class UserActionController {
                         LocalDateTime from = parseISODateTime(fromDate);
                         LocalDateTime to = parseISODateTime(toDate);
 
-                        System.out.println("Checking timestamp: " + timestamp + " against range: " + from + " to " + to);
+                        System.out.println(
+                                        "Checking timestamp: " + timestamp + " against range: " + from + " to " + to);
 
                         boolean inRange = !timestamp.isBefore(from) && !timestamp.isAfter(to);
                         System.out.println("In range: " + inRange);
@@ -363,7 +386,8 @@ public class UserActionController {
         }
 
         private LocalDateTime parseISODateTime(String dateStr) {
-                if (dateStr == null) return null;
+                if (dateStr == null)
+                        return null;
 
                 try {
                         // המרה מ-ISO string ל-LocalDateTime עם התחשבות ב-timezone
@@ -389,7 +413,8 @@ public class UserActionController {
         }
 
         private String formatDateTime(LocalDateTime dateTime) {
-                if (dateTime == null) return null;
+                if (dateTime == null)
+                        return null;
                 return dateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
         }
 

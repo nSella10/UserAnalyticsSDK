@@ -50,7 +50,7 @@ import React, { useEffect, useState } from 'react';
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
 
-function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
+function UserClickLog({ userId: initialUserId, selectedUserIds = [], selectedApp }) {
     const [logs, setLogs] = useState([]);
     const [users, setUsers] = useState([]);
     const [screenSummary, setScreenSummary] = useState(null);
@@ -78,16 +78,18 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
 
     // שליפת המשתמשים
     useEffect(() => {
-        fetch("http://localhost:8080/track/stats/all-users")
+        if (!selectedApp || !selectedApp.apiKey) return;
+
+        fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
             .then(res => res.json())
             .then(data => setUsers(data))
             .catch(err => console.error("Error fetching users:", err));
-    }, []);
+    }, [selectedApp]);
 
     // שליפת הפעולות לפי יוזר
     useEffect(() => {
-        if (!currentUserId) {
-            // אם אין משתמש פעיל, נקה את הנתונים
+        if (!currentUserId || !selectedApp || !selectedApp.apiKey) {
+            // אם אין משתמש פעיל או אפליקציה נבחרת, נקה את הנתונים
             setLogs([]);
             setScreenSummary(null);
             setUserLabel('');
@@ -97,6 +99,7 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
         // בניית URL עם פרמטרי זמן
         const params = new URLSearchParams();
         params.append('userId', currentUserId);
+        params.append('apiKey', selectedApp.apiKey);
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
 
         // טען לוגים וסנן את שורות SCREEN_DURATION
@@ -112,6 +115,7 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
 
         // טען סיכום זמני מסך
         const summaryParams = new URLSearchParams();
+        summaryParams.append('apiKey', selectedApp.apiKey);
         TimeRangeUtils.addTimeRangeToParams(summaryParams, timeRange);
 
         fetch(`http://localhost:8080/screen-time/user-screen-summary/${currentUserId}?${summaryParams.toString()}`)
@@ -132,7 +136,7 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
         } else {
             setUserLabel(currentUserId); // fallback
         }
-    }, [currentUserId, users, timeRange]);
+    }, [currentUserId, users, timeRange, selectedApp]);
 
     const getCategoryIcon = (category) => {
         switch (category) {
@@ -227,11 +231,10 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [] }) {
                                     <button
                                         key={userId}
                                         onClick={() => setActiveUserId(userId)}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                                            isActive
-                                                ? 'bg-blue-600 text-white shadow-lg transform scale-105'
-                                                : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 shadow-sm'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${isActive
+                                            ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                                            : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 shadow-sm'
+                                            }`}
                                     >
                                         <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-white' : 'bg-green-400'}`}></span>
                                         {displayName}

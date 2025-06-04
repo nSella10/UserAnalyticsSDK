@@ -20,8 +20,9 @@ public class UserAction {
 
     private String sessionId; // מזהה סשן (אופציונלי)
     private Map<String, Object> properties;
+    private String apiKey; // API Key של האפליקציה שיצרה את הפעולה
 
-    //constructor
+    // constructor
     public UserAction() {
     }
 
@@ -32,7 +33,8 @@ public class UserAction {
         this.properties = properties;
     }
 
-    public UserAction(String userId, String actionName, LocalDateTime timestamp, String sessionId, Map<String, Object> properties) {
+    public UserAction(String userId, String actionName, LocalDateTime timestamp, String sessionId,
+            Map<String, Object> properties) {
         this.userId = userId;
         this.actionName = actionName;
         this.timestamp = timestamp;
@@ -40,13 +42,30 @@ public class UserAction {
         this.properties = properties;
     }
 
-    //Getter & Setter
+    public UserAction(String userId, String actionName, LocalDateTime timestamp, Map<String, Object> properties,
+            String apiKey) {
+        this.userId = userId;
+        this.actionName = actionName;
+        this.timestamp = timestamp;
+        this.properties = properties;
+        this.apiKey = apiKey;
+    }
+
+    public UserAction(String userId, String actionName, LocalDateTime timestamp, String sessionId,
+            Map<String, Object> properties, String apiKey) {
+        this.userId = userId;
+        this.actionName = actionName;
+        this.timestamp = timestamp;
+        this.sessionId = sessionId;
+        this.properties = properties;
+        this.apiKey = apiKey;
+    }
+
+    // Getter & Setter
 
     public String getId() {
         return id;
     }
-
-
 
     public String getActionName() {
         return actionName;
@@ -86,6 +105,14 @@ public class UserAction {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
     @Override
