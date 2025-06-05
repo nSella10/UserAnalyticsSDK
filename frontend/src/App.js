@@ -13,7 +13,7 @@ function App() {
   const [developer, setDeveloper] = useState(null);
   const [selectedApp, setSelectedApp] = useState(null);
   const [showAppSelector, setShowAppSelector] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  //const [showSettings, setShowSettings] = useState(false);
 
   // בדיקה אם המפתח כבר מחובר
   useEffect(() => {

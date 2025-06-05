@@ -40,19 +40,6 @@ public class UserActionController {
                 return "Action tracked successfully";
         }
 
-        @GetMapping("/stats/count")
-        public long getTotalActionsCount() {
-                return repository.count();
-        }
-
-        @GetMapping("/stats/by-action")
-        public Map<String, Long> getActionCountByName() {
-                return repository.findAll().stream()
-                                .collect(Collectors.groupingBy(
-                                                UserAction::getActionName,
-                                                Collectors.counting()));
-        }
-
         @GetMapping("/stats/all-users")
         public List<User> getAllUsers(@RequestParam(required = false) String apiKey, HttpServletRequest request) {
                 if (apiKey == null || apiKey.trim().isEmpty()) {
@@ -67,31 +54,6 @@ public class UserActionController {
 
                 System.out.println("✅ Found " + filteredUsers.size() + " users for API Key: " + apiKey);
                 return filteredUsers;
-        }
-
-        @GetMapping("/stats/by-date")
-        public Map<String, Long> getActionCountByDate() {
-                return repository.findAll().stream()
-                                .collect(Collectors.groupingBy(
-                                                action -> action.getTimestamp().toLocalDate().toString(),
-                                                TreeMap::new,
-                                                Collectors.counting()));
-        }
-
-        @GetMapping("/stats/most-popular-action")
-        public String getMostPopularAction() {
-                return repository.findAll().stream()
-                                .collect(Collectors.groupingBy(UserAction::getActionName, Collectors.counting()))
-                                .entrySet().stream()
-                                .max(Map.Entry.comparingByValue())
-                                .map(Map.Entry::getKey)
-                                .orElse("No actions found");
-        }
-
-        @DeleteMapping("/delete")
-        public String deleteAllActions() {
-                repository.deleteAll();
-                return "All actions deleted successfully";
         }
 
         @GetMapping("/stats/logs")
@@ -349,15 +311,6 @@ public class UserActionController {
                         e.printStackTrace();
                         return new ArrayList<>();
                 }
-        }
-
-        @GetMapping("/user-actions/users")
-        public List<String> getAllUserIds() {
-                return repository.findAll().stream()
-                                .map(UserAction::getUserId)
-                                .distinct()
-                                .sorted()
-                                .collect(Collectors.toList());
         }
 
         private boolean isInDateRangeFixed(LocalDateTime timestamp, String fromDate, String toDate) {
