@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Legend } from "recharts";
+import config from '../config/config';
 
 
 function ActivityGraph({ selectUser }) {
@@ -9,8 +10,8 @@ function ActivityGraph({ selectUser }) {
     // get the data from server
     const fetchData = () => {
         let url = selectUser
-            ? `http://localhost:8080/track/stats/by-user/by-date?userId=${selectUser}`
-            : `http://localhost:8080/track/stats/by-date`;
+            ? `${config.API_BASE_URL}${config.ENDPOINTS.TRACK.STATS.BY_USER_BY_DATE}?userId=${selectUser}`
+            : `${config.API_BASE_URL}${config.ENDPOINTS.TRACK.STATS.BY_DATE}`;
 
 
 

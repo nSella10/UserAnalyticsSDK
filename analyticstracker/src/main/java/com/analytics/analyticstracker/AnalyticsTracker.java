@@ -26,8 +26,8 @@ import retrofit2.Response;
 
 public class AnalyticsTracker {
 
-    private static String BASE_URL = "http://192.168.7.7:8080/"; // Default base URL
-    private static String API_KEY = null; // API Key של האפליקציה
+    private static String BASE_URL = null; // Base URL - must be initialized
+    private static String API_KEY = null; // API Key של האפליקציה - must be initialized
 
     private static String currentScreen = null;
     private static long screenEnterTime = 0;
@@ -39,15 +39,10 @@ public class AnalyticsTracker {
         Log.d("AnalyticsTracker", "🔗 Initialized with BASE_URL: " + BASE_URL + " and API_KEY: " + apiKey);
     }
 
-    // אתחול עם API Key בלבד (שימוש ב-URL ברירת מחדל)
-    public static void init(String apiKey) {
-        API_KEY = apiKey;
-    }
-
     // שליחת פעולה (event) לשרת
     public static void trackEvent(String userId, String actionName, Map<String, Object> properties) {
-        if (API_KEY == null) {
-            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+        if (API_KEY == null || BASE_URL == null) {
+            Log.e("AnalyticsTracker", "AnalyticsTracker not initialized. Call init(baseUrl, apiKey) first.");
             return;
         }
 
@@ -114,8 +109,8 @@ public class AnalyticsTracker {
         String endTimeStr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
                 .format(new Date(endTimeMillis));
 
-        if (API_KEY == null) {
-            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+        if (API_KEY == null || BASE_URL == null) {
+            Log.e("AnalyticsTracker", "AnalyticsTracker not initialized. Call init(baseUrl, apiKey) first.");
             return;
         }
 
@@ -140,8 +135,8 @@ public class AnalyticsTracker {
 
     // רישום משתמש
     public static void signupUser(User user, Callback<Void> callback) {
-        if (API_KEY == null) {
-            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+        if (API_KEY == null || BASE_URL == null) {
+            Log.e("AnalyticsTracker", "AnalyticsTracker not initialized. Call init(baseUrl, apiKey) first.");
             return;
         }
 
@@ -156,7 +151,12 @@ public class AnalyticsTracker {
 
     // התחברות משתמש
     public static void loginUser(LoginRequest request, Callback<AuthResponse> callback) {
-        Log.d("AnalyticsTracker", "🔐 Attempting login with BASE_URL: " + BASE_URL);
+        if (BASE_URL == null) {
+            Log.e("AnalyticsTracker", "AnalyticsTracker not initialized. Call init(baseUrl, apiKey) first.");
+            return;
+        }
+
+        Log.d("AnalyticsTracker", "🔐 Attempting login with initialized BASE_URL");
         UserApi userApi = ApiClient.getClient(BASE_URL).create(UserApi.class);
         Call<AuthResponse> call = userApi.loginUser(request);
         call.enqueue(callback);
@@ -164,6 +164,11 @@ public class AnalyticsTracker {
 
     // עדכון שם משתמש
     public static void updateUserName(String userId, String firstName, String lastName, Callback<Void> callback) {
+        if (BASE_URL == null) {
+            Log.e("AnalyticsTracker", "AnalyticsTracker not initialized. Call init(baseUrl, apiKey) first.");
+            return;
+        }
+
         UserApi userApi = ApiClient.getClient(BASE_URL).create(UserApi.class);
         UpdateNameRequest request = new UpdateNameRequest(userId, firstName, lastName);
         Call<Void> call = userApi.updateUserName(request);

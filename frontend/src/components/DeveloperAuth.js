@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config/config';
 
 function DeveloperAuth({ onAuthSuccess }) {
     const [isLogin, setIsLogin] = useState(true);
@@ -28,7 +29,7 @@ function DeveloperAuth({ onAuthSuccess }) {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8080/developers/login', {
+            const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.DEVELOPERS.LOGIN}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,7 +47,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                 localStorage.setItem('developerToken', data.token);
                 localStorage.setItem('developerData', JSON.stringify(data.developer));
                 localStorage.setItem('apiKey', data.apiKey);
-                
+
                 setSuccess('התחברות מוצלחת!');
                 setTimeout(() => {
                     onAuthSuccess(data.developer, data.apiKey);
@@ -74,7 +75,7 @@ function DeveloperAuth({ onAuthSuccess }) {
         }
 
         try {
-            const response = await fetch('http://localhost:8080/developers/register', {
+            const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.DEVELOPERS.REGISTER}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -135,11 +136,10 @@ function DeveloperAuth({ onAuthSuccess }) {
                                 setError('');
                                 setSuccess('');
                             }}
-                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                isLogin
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800'
-                            }`}
+                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${isLogin
+                                ? 'bg-white text-blue-600 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-800'
+                                }`}
                         >
                             התחברות
                         </button>
@@ -149,11 +149,10 @@ function DeveloperAuth({ onAuthSuccess }) {
                                 setError('');
                                 setSuccess('');
                             }}
-                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                !isLogin
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800'
-                            }`}
+                            className={`flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${!isLogin
+                                ? 'bg-white text-blue-600 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-800'
+                                }`}
                         >
                             הרשמה
                         </button>
@@ -182,7 +181,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                                     type="email"
                                     required
                                     value={loginData.email}
-                                    onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                     placeholder="developer@company.com"
                                 />
@@ -195,7 +194,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                                     type="password"
                                     required
                                     value={loginData.password}
-                                    onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                     placeholder="••••••••"
                                 />
@@ -220,7 +219,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                                         type="text"
                                         required
                                         value={registerData.firstName}
-                                        onChange={(e) => setRegisterData({...registerData, firstName: e.target.value})}
+                                        onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="יוחנן"
                                     />
@@ -233,7 +232,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                                         type="text"
                                         required
                                         value={registerData.lastName}
-                                        onChange={(e) => setRegisterData({...registerData, lastName: e.target.value})}
+                                        onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="כהן"
                                     />
@@ -247,7 +246,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                                     type="email"
                                     required
                                     value={registerData.email}
-                                    onChange={(e) => setRegisterData({...registerData, email: e.target.value})}
+                                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                     placeholder="developer@company.com"
                                 />
@@ -262,7 +261,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                                         type="password"
                                         required
                                         value={registerData.password}
-                                        onChange={(e) => setRegisterData({...registerData, password: e.target.value})}
+                                        onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="••••••••"
                                     />
@@ -275,7 +274,7 @@ function DeveloperAuth({ onAuthSuccess }) {
                                         type="password"
                                         required
                                         value={registerData.confirmPassword}
-                                        onChange={(e) => setRegisterData({...registerData, confirmPassword: e.target.value})}
+                                        onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                         placeholder="••••••••"
                                     />

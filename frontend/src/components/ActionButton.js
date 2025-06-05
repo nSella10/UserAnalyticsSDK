@@ -1,8 +1,9 @@
 import React from 'react';
+import config from '../config/config';
 
 function ActionButton({ actionName, label, userId, onActionSent }) {
     const handleClick = () => {
-        fetch('http://localhost:8080/track', {
+        fetch(`${config.API_BASE_URL}${config.ENDPOINTS.TRACK.BASE}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

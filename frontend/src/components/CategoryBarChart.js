@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
+import config from '../config/config';
 
 const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory, selectedApp }) => {
   const [data, setData] = useState([]);
@@ -16,7 +17,7 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
   useEffect(() => {
     if (!selectedApp || !selectedApp.apiKey) return;
 
-    fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
+    fetch(`${config.API_BASE_URL}${config.ENDPOINTS.TRACK.STATS.ALL_USERS}?apiKey=${selectedApp.apiKey}`)
       .then(res => res.json())
       .then(users => {
         const map = {};
@@ -33,7 +34,7 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
       TimeRangeUtils.addTimeRangeToParams(params, timeRange);
       params.append('apiKey', selectedApp.apiKey);
 
-      fetch(`http://localhost:8080/track/stats/by-category?${params}`)
+      fetch(`${config.API_BASE_URL}${config.ENDPOINTS.TRACK.STATS.BY_CATEGORY}?${params}`)
         .then(res => res.json())
         .then(data => {
           const options = Object.keys(data);
