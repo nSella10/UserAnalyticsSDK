@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.analytics.analyticsfinal.adapter.GenericItemAdapter;
+import com.analytics.analyticsfinal.config.Config;
 import com.analytics.analyticsfinal.model.DisplayItem;
 import com.analytics.analyticsfinal.pages.AuthActivity;
 import com.analytics.analyticsfinal.pages.CategoryActivity;
@@ -39,12 +40,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle("MyInterest");
 
-        // Initialize the AnalyticsTracker with the server URL and API Key
-        // החלף את ה-API Key בזה שקיבלת מהדשבורד
-        // 192.168.7.7 זה ה-IP של המחשב ברשת המקומית
-        String serverUrl = "http://192.168.7.7:8080/";
-        Log.d("MainActivity", "🔗 Initializing AnalyticsTracker with URL: " + serverUrl);
-        AnalyticsTracker.init(serverUrl, "ak_4a2c2b0243684e448016cb1a");
+        // Initialize the AnalyticsTracker with the server URL and API Key from Config
+        Log.d("MainActivity", "🔗 Initializing AnalyticsTracker with URL: " + Config.BASE_URL);
+        AnalyticsTracker.init(Config.BASE_URL, Config.API_KEY);
 
         categoryRecycler = findViewById(R.id.categoryRecycler);
         categoryRecycler.setLayoutManager(new GridLayoutManager(this, 2));

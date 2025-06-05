@@ -7,4 +7,11 @@
 # Location of the SDK. This is only used by Gradle.
 # For customization when using a Version Control System, please read the
 # header note.
-sdk.dir=C\:\\Users\\noams\\AppData\\Local\\Android\\Sdk
+sdk.dir=YOUR_ANDROID_SDK_PATH
+
+# ===== נתונים רגישים - לא לעלות ל-Git =====
+# כתובת השרת (עדכן לפי הסביבה שלך)
+BASE_URL=http://YOUR_SERVER_IP:8080/
+
+# API Key של האפליקציה (קבל מהדשבורד)
+API_KEY=your_api_key_here

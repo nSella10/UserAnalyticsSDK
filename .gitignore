@@ -1,45 +1,3 @@
-# # === Node (frontend / React) ===
-# node_modules/
-# build/
-# .env
-# npm-debug.log*
-# yarn-debug.log*
-# yarn-error.log*
-# package-lock.json
-
-# # === Android / Gradle ===
-# .gradle/
-# .gradle/**/*
-# **/build/
-# local.properties
-# *.iml
-# .idea/
-# .cxx/
-# .externalNativeBuild/
-# *.apk
-# *.ap_
-# captures/
-# output.json
-
-# # === VSCode ===
-# .vscode/
-# *.log
-
-# # === OS ===
-# .DS_Store
-# Thumbs.db
-
-# # === Misc ===
-# *.bak
-# *.tmp
-# *.old
-# *.orig
-
-# # === Git ===
-# !.gitignore
-
-
-
 # === Node / React (frontend) ===
 frontend/node_modules/
 frontend/build/
@@ -58,6 +16,7 @@ android/.externalNativeBuild/
 android/captures/
 android/output.json
 android/local.properties
+local.properties
 
 # === Java / Gradle ===
 build/

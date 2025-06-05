@@ -1,1 +1,46 @@
+# Build directories
 /build
+*/build/
+build/
+
+# Local configuration files (contain sensitive data)
+local.properties
+*.properties
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Android specific
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+captures/
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Log files
+*.log
+
+# Sensitive or high-churn files
+local.properties
+keystore.properties
+google-services.json
+firebase_options.dart

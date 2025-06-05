@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.analytics.analyticsfinal.MainActivity;
 import com.analytics.analyticsfinal.R;
+import com.analytics.analyticsfinal.config.Config;
 import com.analytics.analyticsfinal.utils.UserManager;
 import com.analytics.analyticstracker.model.AuthResponse;
 import com.analytics.analyticstracker.model.LoginRequest;
@@ -45,11 +46,9 @@ public class AuthActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_auth);
 
-        // אתחול AnalyticsTracker עם API Key
-        String serverUrl = "http://192.168.7.7:8080/";
-        String apiKey = "ak_4a2c2b0243684e448016cb1a";
-        AnalyticsTracker.init(serverUrl, apiKey);
-        Log.d("AuthActivity", "🔧 AnalyticsTracker initialized");
+        // אתחול AnalyticsTracker עם נתונים מקובץ הקונפיגורציה
+        AnalyticsTracker.init(Config.BASE_URL, Config.API_KEY);
+        Log.d("AuthActivity", "🔧 AnalyticsTracker initialized with URL: " + Config.BASE_URL);
 
         initViews();
         setupTabs();

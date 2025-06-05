@@ -1,0 +1,25 @@
+#spring.application.name=User Analytics
+
+# MongoDB Configuration
+# For production, use MongoDB Atlas:
+# spring.data.mongodb.uri=mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/DATABASE_NAME?retryWrites=true&w=majority&appName=CLUSTER_NAME
+
+# For local development, use local MongoDB:
+spring.data.mongodb.uri=mongodb://localhost:27017/user-analytics
+
+# MongoDB Configuration
+spring.data.mongodb.auto-index-creation=true
+
+# Server Configuration
+server.port=8080
+server.address=0.0.0.0
+
+# JWT Configuration
+# Generate a secure secret key for production
+jwt.secret=YOUR_JWT_SECRET_KEY_HERE
+
+# Logging Configuration (for debugging)
+logging.level.com.analytics.user_analytics.controller=DEBUG
+logging.level.com.analytics.user_analytics.service=DEBUG
+logging.level.org.springframework.data.mongodb=DEBUG
+logging.level.org.springframework.web=DEBUG

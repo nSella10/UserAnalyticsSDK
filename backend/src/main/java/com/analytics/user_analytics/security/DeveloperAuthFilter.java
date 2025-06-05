@@ -19,27 +19,28 @@ public class DeveloperAuthFilter extends OncePerRequestFilter {
     private DeveloperService developerService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, 
-                                  FilterChain filterChain) throws ServletException, IOException {
-        
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+
         String path = request.getRequestURI();
-        
+
         // זמנית - נדלג על בדיקת API Key עבור endpoints מסוימים
         if (path.startsWith("/track/") || path.startsWith("/screen-time/")) {
-            // זמנית - נמשיך בלי בדיקת API Key
+            // TODO: הוסף בדיקת API Key כאן
             Developer tempDeveloper = new Developer();
-            tempDeveloper.setId("temp");
+            tempDeveloper.setId("temp_developer");
             request.setAttribute("developer", tempDeveloper);
         }
 
         // עבור endpoints אחרים, זמנית נדלג על בדיקת API Key
-        else if (path.startsWith("/api/") && !path.contains("/developers/login") && !path.contains("/developers/register")) {
-            // זמנית - נמשיך בלי בדיקת API Key
+        else if (path.startsWith("/api/") && !path.contains("/developers/login")
+                && !path.contains("/developers/register")) {
+            // TODO: הוסף בדיקת API Key כאן
             Developer tempDeveloper = new Developer();
-            tempDeveloper.setId("temp");
+            tempDeveloper.setId("temp_developer");
             request.setAttribute("developer", tempDeveloper);
         }
-        
+
         filterChain.doFilter(request, response);
     }
 }

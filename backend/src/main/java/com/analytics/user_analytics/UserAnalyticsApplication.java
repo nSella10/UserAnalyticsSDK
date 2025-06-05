@@ -18,6 +18,12 @@ import java.util.List;
 @SpringBootApplication(scanBasePackages = "com.analytics")
 public class UserAnalyticsApplication implements CommandLineRunner {
 
+	// קבועים לנתוני דמו
+	private static final String DEMO_API_KEY = "ak_demo_app_12345678901234567890";
+	private static final String DEMO_DEVELOPER_EMAIL = "demo@example.com";
+	private static final String DEMO_DEVELOPER_PASSWORD = "demo123";
+	private static final String DEMO_APP_NAME = "Demo Analytics App";
+
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
@@ -53,25 +59,25 @@ public class UserAnalyticsApplication implements CommandLineRunner {
 	private void createDemoData() {
 		try {
 			// יצירת מפתח דמו
-			Developer demoDeveloper = developerRepository.findByEmail("demo@example.com");
+			Developer demoDeveloper = developerRepository.findByEmail(DEMO_DEVELOPER_EMAIL);
 			if (demoDeveloper == null) {
 				demoDeveloper = new Developer();
-				demoDeveloper.setEmail("demo@example.com");
+				demoDeveloper.setEmail(DEMO_DEVELOPER_EMAIL);
 				demoDeveloper.setFirstName("Demo");
 				demoDeveloper.setLastName("Developer");
 				demoDeveloper.setCompanyName("Demo Company");
-				demoDeveloper.setPassword("demo123"); // בפרודקשן צריך להיות מוצפן
+				demoDeveloper.setPassword(DEMO_DEVELOPER_PASSWORD); // בפרודקשן צריך להיות מוצפן
 				demoDeveloper.setCreatedAt(LocalDateTime.now());
 				demoDeveloper = developerRepository.save(demoDeveloper);
 				System.out.println("✅ Created demo developer: " + demoDeveloper.getEmail());
 			}
 
 			// יצירת אפליקציית דמו
-			App demoApp = appRepository.findByApiKey("ak_demo_app_12345678901234567890");
+			App demoApp = appRepository.findByApiKey(DEMO_API_KEY);
 			if (demoApp == null) {
 				demoApp = new App();
-				demoApp.setAppName("Demo Analytics App");
-				demoApp.setApiKey("ak_demo_app_12345678901234567890");
+				demoApp.setAppName(DEMO_APP_NAME);
+				demoApp.setApiKey(DEMO_API_KEY);
 				demoApp.setDeveloperId(demoDeveloper.getId());
 				demoApp.setDescription("Demo application for testing analytics");
 				demoApp.setCreatedAt(LocalDateTime.now());
@@ -147,7 +153,7 @@ public class UserAnalyticsApplication implements CommandLineRunner {
 		// חיפוש אפליקציות עם API Key שונה מהדמו
 		List<App> allApps = appRepository.findAll();
 		for (App app : allApps) {
-			if (!app.getApiKey().equals("ak_demo_app_12345678901234567890")) {
+			if (!app.getApiKey().equals(DEMO_API_KEY)) {
 				System.out.println("🔍 Found app with different API Key: " + app.getApiKey());
 
 				// בדיקה אם כבר יש נתונים לאפליקציה הזו
