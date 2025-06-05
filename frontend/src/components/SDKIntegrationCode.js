@@ -49,12 +49,12 @@ public class MainActivity extends AppCompatActivity {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" dir="rtl">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="text-right">
               <h2 className="text-2xl font-bold text-gray-900">קוד אינטגרציה ל-SDK</h2>
               <p className="text-gray-600 mt-1">אפליקציה: {app.appName}</p>
             </div>
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         {/* Content */}
         <div className="p-6">
           {/* How it works */}
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-right">
             <h3 className="font-semibold text-green-900 mb-3">איך זה עובד?</h3>
             <div className="text-sm text-green-800 space-y-2">
               <p>🔑 <strong>ה-API Key הייחודי שלך</strong> מזהה את האפליקציה שלך ומבדיל אותה מאפליקציות אחרות</p>
@@ -81,31 +81,31 @@ public class MainActivity extends AppCompatActivity {
           </div>
 
           {/* App Details */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-right">
             <h3 className="font-semibold text-blue-900 mb-2">פרטי האפליקציה</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium text-blue-800">שם האפליקציה:</span>
-                <span className="text-blue-700 mr-2">{app.appName}</span>
+                <span className="text-blue-700 ml-2">{app.appName}</span>
               </div>
               <div>
                 <span className="font-medium text-blue-800">API Key:</span>
-                <span className="text-blue-700 mr-2 font-mono">{app.apiKey}</span>
+                <span className="text-blue-700 ml-2 font-mono">{app.apiKey}</span>
               </div>
               <div>
                 <span className="font-medium text-blue-800">תאריך יצירה:</span>
-                <span className="text-blue-700 mr-2">
+                <span className="text-blue-700 ml-2">
                   {new Date(app.createdAt).toLocaleDateString('he-IL')}
                 </span>
               </div>
               <div>
                 <span className="font-medium text-blue-800">סטטוס:</span>
-                <span className="text-green-600 mr-2">פעיל</span>
+                <span className="text-green-600 ml-2">פעיל</span>
               </div>
             </div>
           </div>
 
-          {/* Instructions */}
+          {/* Instructions
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">הוראות אינטגרציה</h3>
             <div className="space-y-3 text-gray-700">
@@ -130,9 +130,9 @@ public class MainActivity extends AppCompatActivity {
                 <p>הרץ את האפליקציה ובדוק שהנתונים מגיעים לדשבורד</p>
               </div>
             </div>
-          </div>
+          </div> */}
 
-          {/* Configuration Section */}
+          {/* Configuration Section
           <div className="mb-6 bg-purple-50 border border-purple-200 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-purple-900 mb-3">הגדרת קובץ local.properties</h3>
             <p className="text-purple-800 mb-3">צור או ערוך את הקובץ <code className="bg-purple-100 px-2 py-1 rounded">local.properties</code> בשורש הפרויקט:</p>
@@ -148,9 +148,9 @@ public class MainActivity extends AppCompatActivity {
             <p className="text-purple-700 text-sm mt-2">
               💡 הקובץ הזה לא יעלה ל-Git ושומר על הנתונים הרגישים שלך בבטחה
             </p>
-          </div>
+          </div> */}
 
-          {/* Code Block */}
+          {/* Code Block
           <div className="relative">
             <div className="flex items-center justify-between bg-gray-800 text-white px-4 py-2 rounded-t-lg">
               <span className="text-sm font-medium">MainActivity.java</span>
@@ -167,10 +167,10 @@ public class MainActivity extends AppCompatActivity {
             <pre className="bg-gray-900 text-gray-100 p-4 rounded-b-lg overflow-x-auto text-sm leading-relaxed">
               <code>{integrationCode}</code>
             </pre>
-          </div>
+          </div> */}
 
           {/* Additional Notes */}
-          <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-right">
             <h4 className="font-semibold text-yellow-800 mb-2">הערות חשובות:</h4>
             <ul className="text-yellow-700 text-sm space-y-1">
               <li>• הגדר את הקובץ local.properties עם BASE_URL ו-API_KEY שלך</li>
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-          <div className="flex justify-end space-x-3 space-x-reverse">
+          <div className="flex justify-start space-x-3">
             <button
               onClick={onClose}
               className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
