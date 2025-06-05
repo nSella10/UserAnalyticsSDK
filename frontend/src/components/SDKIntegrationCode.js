@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // אתחול ה-SDK עם URL השרת וה-API Key שלך
-        AnalyticsTracker.init("http://localhost:8080/", "${app.apiKey}");
+        AnalyticsTracker.init(Config.BASE_URL, Config.API_KEY);
 
         // דוגמה לשליחת אירוע
         Map<String, Object> properties = new HashMap<>();
@@ -115,11 +115,11 @@ public class MainActivity extends AppCompatActivity {
               </div>
               <div className="flex items-start">
                 <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
-                <p>העתק את הקוד למטה והדבק אותו ב-MainActivity שלך</p>
+                <p>הגדר את הקובץ local.properties עם BASE_URL ו-API_KEY שלך</p>
               </div>
               <div className="flex items-start">
                 <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
-                <p>החלף את "http://localhost:8080/" ב-URL של השרת שלך (אם רלוונטי)</p>
+                <p>העתק את הקוד למטה והדבק אותו ב-MainActivity שלך</p>
               </div>
               <div className="flex items-start">
                 <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">4</span>
@@ -130,6 +130,24 @@ public class MainActivity extends AppCompatActivity {
                 <p>הרץ את האפליקציה ובדוק שהנתונים מגיעים לדשבורד</p>
               </div>
             </div>
+          </div>
+
+          {/* Configuration Section */}
+          <div className="mb-6 bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-purple-900 mb-3">הגדרת קובץ local.properties</h3>
+            <p className="text-purple-800 mb-3">צור או ערוך את הקובץ <code className="bg-purple-100 px-2 py-1 rounded">local.properties</code> בשורש הפרויקט:</p>
+            <div className="bg-purple-900 text-purple-100 p-3 rounded font-mono text-sm">
+              <div># Android SDK path (יתעדכן אוטומטית)</div>
+              <div>sdk.dir=YOUR_ANDROID_SDK_PATH</div>
+              <div className="mt-2"># ===== נתונים רגישים - לא לעלות ל-Git =====</div>
+              <div># כתובת השרת (עדכן לפי הסביבה שלך)</div>
+              <div>BASE_URL=http://YOUR_SERVER_IP:8080/</div>
+              <div className="mt-1"># API Key של האפליקציה</div>
+              <div>API_KEY={app.apiKey}</div>
+            </div>
+            <p className="text-purple-700 text-sm mt-2">
+              💡 הקובץ הזה לא יעלה ל-Git ושומר על הנתונים הרגישים שלך בבטחה
+            </p>
           </div>
 
           {/* Code Block */}
@@ -155,7 +173,8 @@ public class MainActivity extends AppCompatActivity {
           <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h4 className="font-semibold text-yellow-800 mb-2">הערות חשובות:</h4>
             <ul className="text-yellow-700 text-sm space-y-1">
-              <li>• שמור את ה-API Key במקום בטוח ואל תחשוף אותו בקוד פומבי</li>
+              <li>• הגדר את הקובץ local.properties עם BASE_URL ו-API_KEY שלך</li>
+              <li>• ה-API Key וכתובת השרת נשמרים בקובץ local.properties ולא עולים ל-Git</li>
               <li>• כל משתמש צריך לקבל ID ייחודי עקבי (למשל מהמערכת שלך)</li>
               <li>• ה-API Key מזהה את האפליקציה שלך ומבדיל אותה מאפליקציות אחרות</li>
               <li>• ה-SDK ישלח אוטומטית נתונים לשרת עם ה-API Key שלך</li>
