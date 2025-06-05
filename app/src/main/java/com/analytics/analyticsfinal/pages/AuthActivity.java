@@ -2,6 +2,9 @@ package com.analytics.analyticsfinal.pages;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,7 +16,6 @@ import com.analytics.analyticstracker.model.LoginRequest;
 import com.analytics.analyticsfinal.utils.TokenManager;
 import com.analytics.analyticstracker.AnalyticsTracker;
 import com.analytics.analyticstracker.model.User;
-
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,6 +45,12 @@ public class AuthActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_auth);
 
+        // אתחול AnalyticsTracker עם API Key
+        String serverUrl = "http://192.168.7.7:8080/";
+        String apiKey = "ak_4a2c2b0243684e448016cb1a";
+        AnalyticsTracker.init(serverUrl, apiKey);
+        Log.d("AuthActivity", "🔧 AnalyticsTracker initialized");
+
         initViews();
         setupTabs();
         setupGenderSpinner();
@@ -66,6 +74,12 @@ public class AuthActivity extends AppCompatActivity {
         signupAge = findViewById(R.id.signupAge);
         signupGender = findViewById(R.id.signupGender);
         signupButton = findViewById(R.id.signupButton);
+
+        // בדיקה שכל הרכיבים נמצאו
+        Log.d("AuthActivity", "🔍 Views found - signupButton: " + (signupButton != null));
+        if (signupButton == null) {
+            Log.e("AuthActivity", "❌ signupButton is null!");
+        }
     }
 
     private void setupTabs() {
@@ -77,22 +91,47 @@ public class AuthActivity extends AppCompatActivity {
         formSwitcher.setDisplayedChild(index);
         if (index == 0) {
             loginTab.setBackgroundResource(R.drawable.tab_selected);
-            signupTab.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            loginTab.setTextColor(getResources().getColor(R.color.text_white));
+            signupTab.setBackgroundResource(R.drawable.tab_unselected);
+            signupTab.setTextColor(getResources().getColor(R.color.text_secondary));
         } else {
             signupTab.setBackgroundResource(R.drawable.tab_selected);
-            loginTab.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            signupTab.setTextColor(getResources().getColor(R.color.text_white));
+            loginTab.setBackgroundResource(R.drawable.tab_unselected);
+            loginTab.setTextColor(getResources().getColor(R.color.text_secondary));
         }
     }
 
     private void setupGenderSpinner() {
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,
-                new String[]{"MALE", "FEMALE", "OTHER"});
+                new String[] { "MALE", "FEMALE", "OTHER" });
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         signupGender.setAdapter(genderAdapter);
     }
 
     private void setupLoginLogic() {
+        // הוספת מעבר אוטומטי בין שדות הטקסט
+        loginEmail.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                loginPassword.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
+        // הוספת מעבר אוטומטי כשלוחצים Enter בשדה הסיסמה
+        loginPassword.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                loginButton.performClick();
+                return true;
+            }
+            return false;
+        });
+
         loginButton.setOnClickListener(v -> {
             String email = loginEmail.getText().toString().trim();
             String password = loginPassword.getText().toString();
@@ -122,7 +161,7 @@ public class AuthActivity extends AppCompatActivity {
                         UserManager.setAge(AuthActivity.this, user.getAge());
                         UserManager.setGender(AuthActivity.this, user.getGender().toString());
 
-                        showToast("Welcome " + user.getFirstName() +" "+ user.getLastName());
+                        showToast("Welcome " + user.getFirstName() + " " + user.getLastName());
                         goToMainActivity();
 
                     } else {
@@ -149,19 +188,78 @@ public class AuthActivity extends AppCompatActivity {
         });
     }
 
-
     private void setupSignupLogic() {
+        Log.d("AuthActivity", "🔧 Setting up signup logic, button: " + (signupButton != null));
+
+        if (signupButton == null) {
+            Log.e("AuthActivity", "❌ Cannot setup signup logic - button is null!");
+            return;
+        }
+
+        // הוספת מעבר אוטומטי בין שדות הטקסט
+        signupFirstName.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                signupLastName.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
+        signupLastName.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                signupEmail.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
+        signupEmail.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                signupPassword.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
+        signupPassword.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                signupAge.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
+        signupAge.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT ||
+                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                signupGender.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
         signupButton.setOnClickListener(v -> {
+            Log.d("AuthActivity", "🔥 Signup button clicked!");
+
             String first = signupFirstName.getText().toString().trim();
             String last = signupLastName.getText().toString().trim();
             String email = signupEmail.getText().toString().trim();
             String password = signupPassword.getText().toString();
             String ageText = signupAge.getText().toString().trim();
 
+            Log.d("AuthActivity", "📝 Form data: " + first + ", " + last + ", " + email + ", age: " + ageText);
+
             if (first.isEmpty() || last.isEmpty() || email.isEmpty() || password.isEmpty() || ageText.isEmpty()) {
+                Log.w("AuthActivity", "⚠️ Empty fields detected");
                 showToast("Please fill in all fields.");
                 return;
             }
+
+            Log.d("AuthActivity", "✅ All fields filled, proceeding with validation");
 
             if (!first.matches("^[A-Za-z]+$") || !last.matches("^[A-Za-z]+$")) {
                 showToast("Names must not contain numbers or symbols.");
@@ -173,7 +271,6 @@ public class AuthActivity extends AppCompatActivity {
                 return;
             }
 
-
             int age;
             try {
                 age = Integer.parseInt(ageText);
@@ -183,8 +280,9 @@ public class AuthActivity extends AppCompatActivity {
             }
 
             User.Gender gender = User.Gender.valueOf(signupGender.getSelectedItem().toString());
-            User user = new User(null,first, last, age, gender, email, password);
+            User user = new User(null, first, last, age, gender, email, password);
 
+            Log.d("AuthActivity", "🚀 Sending signup request for: " + email);
             AnalyticsTracker.signupUser(user, new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
@@ -232,6 +330,5 @@ public class AuthActivity extends AppCompatActivity {
                 .putString("jwt_token", token)
                 .apply();
     }
-    
-}
 
+}
