@@ -37,14 +37,14 @@ public class MainActivity extends AppCompatActivity {
         // Set up the toolbar
         Toolbar toolbar = findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
-        setTitle("My Interests");
+        setTitle("MyInterest");
 
         // Initialize the AnalyticsTracker with the server URL and API Key
         // החלף את ה-API Key בזה שקיבלת מהדשבורד
         // 192.168.7.7 זה ה-IP של המחשב ברשת המקומית
         String serverUrl = "http://192.168.7.7:8080/";
         Log.d("MainActivity", "🔗 Initializing AnalyticsTracker with URL: " + serverUrl);
-        AnalyticsTracker.init(serverUrl, "ak_77dc46998b1e42458770029d");
+        AnalyticsTracker.init(serverUrl, "ak_4a2c2b0243684e448016cb1a");
 
         categoryRecycler = findViewById(R.id.categoryRecycler);
         categoryRecycler.setLayoutManager(new GridLayoutManager(this, 2));
@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main_menu, menu); // Inflate the menu; this adds items to the action bar if it
                                                            // is present.
         return true;
-
     }
 
     @Override
