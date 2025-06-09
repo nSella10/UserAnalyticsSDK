@@ -1,5 +1,5 @@
 # Multi-stage build for better optimization
-FROM gradle:8.11.1-jdk17 AS build
+FROM gradle:8-jdk17 AS build
 
 # Set working directory
 WORKDIR /app
@@ -11,7 +11,7 @@ COPY backend/ ./
 RUN gradle build -x test --no-daemon
 
 # Production stage
-FROM openjdk:17-jre-slim
+FROM openjdk:17-jdk-slim
 
 # Set working directory
 WORKDIR /app
