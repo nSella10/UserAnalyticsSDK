@@ -23,10 +23,11 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import com.analytics.analyticstracker.config.TrackerConfig;
 
 public class AnalyticsTracker {
 
-    private static String BASE_URL = "http://192.168.7.7:8080/"; // Default base URL
+    private static String BASE_URL = TrackerConfig.BASE_URL; // Default base URL from config
     private static String API_KEY = null; // API Key של האפליקציה
 
     private static String currentScreen = null;
@@ -42,6 +43,15 @@ public class AnalyticsTracker {
     // אתחול עם API Key בלבד (שימוש ב-URL ברירת מחדל)
     public static void init(String apiKey) {
         API_KEY = apiKey;
+        Log.d("AnalyticsTracker", "🔗 Initialized with default BASE_URL: " + BASE_URL + " and API_KEY: " + apiKey);
+    }
+
+    // אתחול עם ברירת מחדל מלאה (לבדיקות מהירות)
+    public static void initWithDefaults() {
+        BASE_URL = TrackerConfig.BASE_URL;
+        API_KEY = TrackerConfig.DEFAULT_API_KEY;
+        Log.d("AnalyticsTracker",
+                "🔗 Initialized with all defaults - BASE_URL: " + BASE_URL + " and API_KEY: " + API_KEY);
     }
 
     // שליחת פעולה (event) לשרת
@@ -125,7 +135,8 @@ public class AnalyticsTracker {
             return;
         }
 
-        Log.d("AnalyticsTracker", "📊 Sending screen time: " + screenName + " (" + durationMillis + "ms) to " + BASE_URL);
+        Log.d("AnalyticsTracker",
+                "📊 Sending screen time: " + screenName + " (" + durationMillis + "ms) to " + BASE_URL);
 
         com.analytics.analyticstracker.model.ScreenTime screenTime = new com.analytics.analyticstracker.model.ScreenTime(
                 userId, screenName, durationMillis, startTimeStr, endTimeStr, null, API_KEY);
@@ -139,13 +150,15 @@ public class AnalyticsTracker {
                     Log.d("AnalyticsTracker",
                             "✅ Screen time sent successfully: " + screenName + " (" + durationMillis + "ms)");
                 } else {
-                    Log.e("AnalyticsTracker", "❌ Screen time failed with code: " + response.code() + " for: " + screenName);
+                    Log.e("AnalyticsTracker",
+                            "❌ Screen time failed with code: " + response.code() + " for: " + screenName);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Log.e("AnalyticsTracker", "❌ Network error sending screen time '" + screenName + "': " + t.getMessage());
+                Log.e("AnalyticsTracker",
+                        "❌ Network error sending screen time '" + screenName + "': " + t.getMessage());
                 Log.e("AnalyticsTracker", "🔗 Attempted URL: " + BASE_URL);
             }
         });

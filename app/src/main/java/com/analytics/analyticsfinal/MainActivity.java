@@ -39,12 +39,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         setTitle("MyInterest");
 
-        // Initialize the AnalyticsTracker with the server URL and API Key
-        // החלף את ה-API Key בזה שקיבלת מהדשבורד
-        // 192.168.7.7 זה ה-IP של המחשב ברשת המקומית
-        String serverUrl = "http://192.168.7.7:8080/";
-        Log.d("MainActivity", "🔗 Initializing AnalyticsTracker with URL: " + serverUrl);
-        AnalyticsTracker.init(serverUrl, "ak_4a2c2b0243684e448016cb1a");
+        // Initialize the AnalyticsTracker with default configuration
+        // כל ההגדרות נמצאות בקובץ TrackerConfig
+        Log.d("MainActivity", "🔗 Initializing AnalyticsTracker with default configuration");
+        AnalyticsTracker.initWithDefaults();
 
         categoryRecycler = findViewById(R.id.categoryRecycler);
         categoryRecycler.setLayoutManager(new GridLayoutManager(this, 2));

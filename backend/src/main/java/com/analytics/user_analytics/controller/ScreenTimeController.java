@@ -42,32 +42,6 @@ public class ScreenTimeController {
         }
     }
 
-    // קבלת כל זמני המסך
-    @GetMapping("/all")
-    public ResponseEntity<List<ScreenTime>> getAllScreenTimes() {
-        try {
-            List<ScreenTime> screenTimes = screenTimeRepository.findAll();
-            return ResponseEntity.ok(screenTimes);
-        } catch (Exception e) {
-            System.err.println("❌ Error getting all screen times: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-    // קבלת זמני מסך לפי משתמש
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ScreenTime>> getScreenTimesByUser(@PathVariable String userId) {
-        try {
-            List<ScreenTime> screenTimes = screenTimeRepository.findByUserId(userId);
-            return ResponseEntity.ok(screenTimes);
-        } catch (Exception e) {
-            System.err.println("❌ Error getting screen times for user: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
     // סטטיסטיקות זמני מסך לפי מסך
     @GetMapping("/stats/by-screen")
     public ResponseEntity<Map<String, Long>> getScreenTimeStatsByScreen(
@@ -126,105 +100,6 @@ public class ScreenTimeController {
             e.printStackTrace();
             return ResponseEntity.status(500).body(null);
         }
-    }
-
-    // סטטיסטיקות זמני מסך לפי משתמש
-    @GetMapping("/stats/by-user")
-    public ResponseEntity<Map<String, Long>> getScreenTimeStatsByUser(
-            @RequestParam(required = false) String fromDate,
-            @RequestParam(required = false) String toDate) {
-        try {
-            List<ScreenTime> screenTimes = screenTimeRepository.findAll();
-
-            // פילטר לפי תאריכים אם נדרש
-            if (fromDate != null && toDate != null) {
-                LocalDateTime from = LocalDateTime.parse(fromDate.replace("Z", ""));
-                LocalDateTime to = LocalDateTime.parse(toDate.replace("Z", ""));
-
-                screenTimes = screenTimes.stream()
-                        .filter(st -> !st.getTimestamp().isBefore(from) && !st.getTimestamp().isAfter(to))
-                        .collect(Collectors.toList());
-            }
-
-            // חישוב סך זמן לכל משתמש
-            Map<String, Long> stats = screenTimes.stream()
-                    .collect(Collectors.groupingBy(
-                            ScreenTime::getUserId,
-                            Collectors.summingLong(ScreenTime::getDuration)));
-
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            System.err.println("❌ Error calculating screen time stats by user: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-    // פעילות זמני מסך למשתמש עם פורמט קריא
-    @GetMapping("/user-screen-time/{userId}")
-    public ResponseEntity<List<Map<String, Object>>> getUserScreenTime(
-            @PathVariable String userId,
-            @RequestParam(required = false) String fromDate,
-            @RequestParam(required = false) String toDate) {
-        try {
-            System.out.println("=== USER SCREEN TIME REQUEST ===");
-            System.out.println("userId: " + userId);
-            System.out.println("fromDate: " + fromDate);
-            System.out.println("toDate: " + toDate);
-
-            List<ScreenTime> screenTimes = screenTimeRepository.findByUserId(userId);
-
-            // פילטר לפי תאריכים אם נדרש
-            if (fromDate != null && toDate != null) {
-                LocalDateTime from = parseISODateTime(fromDate);
-                LocalDateTime to = parseISODateTime(toDate);
-
-                System.out.println("Filtering screen times from: " + from + " to: " + to);
-
-                screenTimes = screenTimes.stream()
-                        .filter(st -> {
-                            boolean inRange = !st.getTimestamp().isBefore(from) && !st.getTimestamp().isAfter(to);
-                            if (!inRange) {
-                                System.out
-                                        .println("Filtered out screen time: " + st.getTimestamp() + " (not in range)");
-                            }
-                            return inRange;
-                        })
-                        .collect(Collectors.toList());
-            }
-
-            List<Map<String, Object>> result = screenTimes.stream()
-                    .map(screenTime -> {
-                        Map<String, Object> item = new HashMap<>();
-                        item.put("id", screenTime.getId());
-                        item.put("screenName", screenTime.getScreenName());
-                        item.put("duration", formatDuration(screenTime.getDuration()));
-                        item.put("durationMs", screenTime.getDuration());
-                        item.put("startTime", formatDateTime(screenTime.getStartTime()));
-                        item.put("endTime", formatDateTime(screenTime.getEndTime()));
-                        item.put("timestamp", formatDateTime(screenTime.getTimestamp()));
-                        item.put("sessionId", screenTime.getSessionId());
-                        return item;
-                    })
-                    .sorted((a, b) -> {
-                        String timeA = (String) a.get("timestamp");
-                        String timeB = (String) b.get("timestamp");
-                        return timeB.compareTo(timeA); // מיון לפי זמן יורד
-                    })
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            System.err.println("❌ Error getting user screen time: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-    private String formatDateTime(LocalDateTime dateTime) {
-        if (dateTime == null)
-            return null;
-        return dateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     }
 
     // סיכום זמני מסך לפי קטגוריות למשתמש

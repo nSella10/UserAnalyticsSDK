@@ -1,1 +1,29 @@
 /build
+
+# Sensitive configuration files
+analyticstracker/src/main/java/com/analytics/analyticstracker/config/TrackerConfig.java
+app/local.properties
+local.properties
+
+# API Keys and secrets
+*.key
+*.secret
+config.properties
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Gradle files
+.gradle/
+build/
+*/build/
+
+# Android files
+*.apk
+*.aab

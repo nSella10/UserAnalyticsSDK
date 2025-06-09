@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:3001", "http://localhost:3002" })
+@CrossOrigin(origins = { "http://localhost:3000"})
 @RestController
 @RequestMapping("/track")
 public class UserActionController {
@@ -67,31 +67,6 @@ public class UserActionController {
 
                 System.out.println("✅ Found " + filteredUsers.size() + " users for API Key: " + apiKey);
                 return filteredUsers;
-        }
-
-        @GetMapping("/stats/by-date")
-        public Map<String, Long> getActionCountByDate() {
-                return repository.findAll().stream()
-                                .collect(Collectors.groupingBy(
-                                                action -> action.getTimestamp().toLocalDate().toString(),
-                                                TreeMap::new,
-                                                Collectors.counting()));
-        }
-
-        @GetMapping("/stats/most-popular-action")
-        public String getMostPopularAction() {
-                return repository.findAll().stream()
-                                .collect(Collectors.groupingBy(UserAction::getActionName, Collectors.counting()))
-                                .entrySet().stream()
-                                .max(Map.Entry.comparingByValue())
-                                .map(Map.Entry::getKey)
-                                .orElse("No actions found");
-        }
-
-        @DeleteMapping("/delete")
-        public String deleteAllActions() {
-                repository.deleteAll();
-                return "All actions deleted successfully";
         }
 
         @GetMapping("/stats/logs")
@@ -313,44 +288,6 @@ public class UserActionController {
                                 .collect(Collectors.toList());
         }
 
-        // פעילות משתמש מפורטת עם פילטרי זמן מתוקנים
-        @GetMapping("/user-actions/user-activity/{userId}")
-        public List<Map<String, Object>> getUserActivity(
-                        @PathVariable String userId,
-                        @RequestParam(required = false) String fromDate,
-                        @RequestParam(required = false) String toDate) {
-                try {
-                        System.out.println("=== USER ACTIVITY REQUEST ===");
-                        System.out.println("userId: " + userId);
-                        System.out.println("fromDate: " + fromDate);
-                        System.out.println("toDate: " + toDate);
-
-                        List<UserAction> userActions = repository.findAll().stream()
-                                        .filter(action -> action.getUserId().equals(userId))
-                                        .filter(action -> isInDateRangeFixed(action.getTimestamp(), fromDate, toDate))
-                                        .sorted(Comparator.comparing(UserAction::getTimestamp).reversed())
-                                        .collect(Collectors.toList());
-
-                        System.out.println("Found " + userActions.size() + " actions for user " + userId);
-
-                        return userActions.stream()
-                                        .map(action -> {
-                                                Map<String, Object> item = new HashMap<>();
-                                                item.put("id", action.getId());
-                                                item.put("actionName", action.getActionName());
-                                                item.put("timestamp", formatDateTime(action.getTimestamp()));
-                                                item.put("sessionId", action.getSessionId());
-                                                item.put("properties", action.getProperties());
-                                                return item;
-                                        })
-                                        .collect(Collectors.toList());
-                } catch (Exception e) {
-                        System.err.println("❌ Error getting user activity: " + e.getMessage());
-                        e.printStackTrace();
-                        return new ArrayList<>();
-                }
-        }
-
         @GetMapping("/user-actions/users")
         public List<String> getAllUserIds() {
                 return repository.findAll().stream()
@@ -410,12 +347,6 @@ public class UserActionController {
                                 return LocalDateTime.now();
                         }
                 }
-        }
-
-        private String formatDateTime(LocalDateTime dateTime) {
-                if (dateTime == null)
-                        return null;
-                return dateTime.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
         }
 
 }

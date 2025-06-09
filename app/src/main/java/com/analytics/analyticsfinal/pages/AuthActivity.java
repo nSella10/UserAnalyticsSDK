@@ -45,11 +45,9 @@ public class AuthActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_auth);
 
-        // אתחול AnalyticsTracker עם API Key
-        String serverUrl = "http://192.168.7.7:8080/";
-        String apiKey = "ak_4a2c2b0243684e448016cb1a";
-        AnalyticsTracker.init(serverUrl, apiKey);
-        Log.d("AuthActivity", "🔧 AnalyticsTracker initialized");
+        // אתחול AnalyticsTracker עם הגדרות ברירת מחדל
+        AnalyticsTracker.initWithDefaults();
+        Log.d("AuthActivity", "🔧 AnalyticsTracker initialized with default config");
 
         initViews();
         setupTabs();
@@ -114,7 +112,8 @@ public class AuthActivity extends AppCompatActivity {
         // הוספת מעבר אוטומטי בין שדות הטקסט
         loginEmail.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_NEXT ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 loginPassword.requestFocus();
                 return true;
             }
@@ -202,7 +201,8 @@ public class AuthActivity extends AppCompatActivity {
         // הוספת מעבר אוטומטי בין שדות הטקסט
         signupFirstName.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_NEXT ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 signupLastName.requestFocus();
                 return true;
             }
@@ -211,7 +211,8 @@ public class AuthActivity extends AppCompatActivity {
 
         signupLastName.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_NEXT ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 signupEmail.requestFocus();
                 return true;
             }
@@ -220,7 +221,8 @@ public class AuthActivity extends AppCompatActivity {
 
         signupEmail.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_NEXT ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 signupPassword.requestFocus();
                 return true;
             }
@@ -229,7 +231,8 @@ public class AuthActivity extends AppCompatActivity {
 
         signupPassword.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_NEXT ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 signupAge.requestFocus();
                 return true;
             }
@@ -238,7 +241,8 @@ public class AuthActivity extends AppCompatActivity {
 
         signupAge.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_NEXT ||
-                (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
                 signupGender.requestFocus();
                 return true;
             }
