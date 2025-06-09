@@ -41,6 +41,14 @@ function App() {
     }
   }, []);
 
+  // ✅ איפוס בחירות כשמשנים אפליקציה
+  useEffect(() => {
+    if (selectedApp) {
+      setSelectedUsers([]);
+      setSelectedCategory('');
+    }
+  }, [selectedApp?.id]); // רק כשה-ID של האפליקציה משתנה
+
   const handleAuthSuccess = (developerData) => {
     setIsAuthenticated(true);
     setDeveloper(developerData);
@@ -54,6 +62,10 @@ function App() {
     setSelectedApp(app);
     setShowAppSelector(false);
 
+    // ✅ איפוס בחירת משתמשים כשעוברים לאפליקציה חדשה
+    setSelectedUsers([]);
+    setSelectedCategory('');
+
     // שמירה ב-localStorage
     localStorage.setItem('selectedApp', JSON.stringify(app));
   };
@@ -61,6 +73,11 @@ function App() {
   const handleBackToApps = () => {
     setSelectedApp(null);
     setShowAppSelector(true);
+
+    // ✅ איפוס כל הבחירות כשחוזרים לבחירת אפליקציות
+    setSelectedUsers([]);
+    setSelectedCategory('');
+
     localStorage.removeItem('selectedApp');
   };
 
@@ -71,6 +88,10 @@ function App() {
     setDeveloper(null);
     setSelectedApp(null);
     setShowAppSelector(false);
+
+    // ✅ איפוס כל הבחירות בהתנתקות
+    setSelectedUsers([]);
+    setSelectedCategory('');
   };
   const [selectedCategory, setSelectedCategory] = useState('');
 
