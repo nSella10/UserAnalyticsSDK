@@ -1,8 +1,6 @@
 /build
 
 # Sensitive configuration files
-TrackerConfig.java
-**/TrackerConfig.java
 analyticstracker/src/main/java/com/analytics/analyticstracker/config/TrackerConfig.java
 app/local.properties
 local.properties
@@ -34,3 +32,6 @@ temp/
 # Android files
 *.apk
 *.aab
+
+# Exclude TrackerConfig.java specifically
+analyticstracker/src/main/java/com/analytics/analyticstracker/config/TrackerConfig.java
