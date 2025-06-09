@@ -4,16 +4,16 @@ FROM openjdk:17-jdk-slim
 # Set working directory
 WORKDIR /app
 
-# Copy gradle wrapper files first
-COPY backend/gradle/ ./gradle/
-COPY backend/gradlew ./gradlew
-COPY backend/gradlew.bat ./gradlew.bat
+# Copy gradle wrapper files from root (they work for backend too)
+COPY gradle/ ./gradle/
+COPY gradlew ./gradlew
+COPY gradlew.bat ./gradlew.bat
 
-# Copy gradle configuration files
+# Copy backend gradle configuration files
 COPY backend/build.gradle ./build.gradle
 COPY backend/settings.gradle ./settings.gradle
 
-# Copy source code
+# Copy backend source code
 COPY backend/src/ ./src/
 
 # Make gradlew executable
