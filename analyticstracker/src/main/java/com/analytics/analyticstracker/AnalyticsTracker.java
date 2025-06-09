@@ -47,11 +47,12 @@ public class AnalyticsTracker {
     // שליחת פעולה (event) לשרת
     public static void trackEvent(String userId, String actionName, Map<String, Object> properties) {
         if (API_KEY == null) {
-            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+            Log.e("AnalyticsTracker", "❌ API Key not initialized. Call init() first.");
             return;
         }
 
         String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date());
+        Log.d("AnalyticsTracker", "📤 Sending event: " + actionName + " to " + BASE_URL + " for user: " + userId);
 
         ActionEvent event = new ActionEvent(userId, actionName, timestamp, properties, API_KEY);
         TrackerApi api = ApiClient.getClient(BASE_URL).create(TrackerApi.class);
@@ -60,12 +61,17 @@ public class AnalyticsTracker {
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                Log.d("AnalyticsTracker", "Event sent successfully: " + actionName);
+                if (response.isSuccessful()) {
+                    Log.d("AnalyticsTracker", "✅ Event sent successfully: " + actionName);
+                } else {
+                    Log.e("AnalyticsTracker", "❌ Event failed with code: " + response.code() + " for: " + actionName);
+                }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Log.e("AnalyticsTracker", "Failed to send event: " + t.getMessage());
+                Log.e("AnalyticsTracker", "❌ Network error sending event '" + actionName + "': " + t.getMessage());
+                Log.e("AnalyticsTracker", "🔗 Attempted URL: " + BASE_URL);
             }
         });
     }
@@ -115,9 +121,11 @@ public class AnalyticsTracker {
                 .format(new Date(endTimeMillis));
 
         if (API_KEY == null) {
-            Log.e("AnalyticsTracker", "API Key not initialized. Call init() first.");
+            Log.e("AnalyticsTracker", "❌ API Key not initialized. Call init() first.");
             return;
         }
+
+        Log.d("AnalyticsTracker", "📊 Sending screen time: " + screenName + " (" + durationMillis + "ms) to " + BASE_URL);
 
         com.analytics.analyticstracker.model.ScreenTime screenTime = new com.analytics.analyticstracker.model.ScreenTime(
                 userId, screenName, durationMillis, startTimeStr, endTimeStr, null, API_KEY);
@@ -127,13 +135,18 @@ public class AnalyticsTracker {
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                Log.d("AnalyticsTracker",
-                        "✅ Screen time sent successfully: " + screenName + " (" + durationMillis + "ms)");
+                if (response.isSuccessful()) {
+                    Log.d("AnalyticsTracker",
+                            "✅ Screen time sent successfully: " + screenName + " (" + durationMillis + "ms)");
+                } else {
+                    Log.e("AnalyticsTracker", "❌ Screen time failed with code: " + response.code() + " for: " + screenName);
+                }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Log.e("AnalyticsTracker", "❌ Failed to send screen time: " + t.getMessage());
+                Log.e("AnalyticsTracker", "❌ Network error sending screen time '" + screenName + "': " + t.getMessage());
+                Log.e("AnalyticsTracker", "🔗 Attempted URL: " + BASE_URL);
             }
         });
     }

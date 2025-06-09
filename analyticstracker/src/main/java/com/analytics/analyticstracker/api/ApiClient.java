@@ -7,9 +7,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     private static Retrofit retrofit = null;
+    private static String currentBaseUrl = null;
 
     public static Retrofit getClient(String baseUrl) {
-        if (retrofit == null) {
+        // אם ה-URL השתנה או שזה הפעם הראשונה, צור Retrofit חדש
+        if (retrofit == null || !baseUrl.equals(currentBaseUrl)) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -22,6 +24,9 @@ public class ApiClient {
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
+
+            currentBaseUrl = baseUrl;
+            android.util.Log.d("ApiClient", "🔗 Created new Retrofit client for: " + baseUrl);
         }
 
         return retrofit;

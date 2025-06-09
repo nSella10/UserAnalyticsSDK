@@ -159,7 +159,10 @@ public class AuthActivity extends AppCompatActivity {
                         UserManager.setLastName(AuthActivity.this, user.getLastName());
                         UserManager.setEmail(AuthActivity.this, user.getEmail());
                         UserManager.setAge(AuthActivity.this, user.getAge());
-                        UserManager.setGender(AuthActivity.this, user.getGender().toString());
+
+                        // ✅ טיפול בגנדר עם בדיקת null
+                        String genderString = user.getGender() != null ? user.getGender().toString() : "OTHER";
+                        UserManager.setGender(AuthActivity.this, genderString);
 
                         showToast("Welcome " + user.getFirstName() + " " + user.getLastName());
                         goToMainActivity();
