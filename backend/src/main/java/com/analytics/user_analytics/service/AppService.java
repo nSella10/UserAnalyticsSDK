@@ -46,6 +46,13 @@ public class AppService {
     public App getAppByApiKey(String apiKey) {
         return appRepository.findByApiKey(apiKey);
     }
+
+    /**
+     * מציאת אפליקציה לפי API Key (alias לgetAppByApiKey)
+     */
+    public App findByApiKey(String apiKey) {
+        return appRepository.findByApiKey(apiKey);
+    }
     
     /**
      * עדכון אפליקציה

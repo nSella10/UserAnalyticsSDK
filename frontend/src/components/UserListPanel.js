@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from "react";
+import { authenticatedFetch } from '../config/api';
 
 function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selectedApp }) {
   const [users, setUsers] = useState([]);
@@ -15,8 +16,8 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selec
 
     setIsLoading(true);
 
-    // שליחת בקשה עם API Key של האפליקציה הנבחרת
-    fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
+    // שליחת בקשה עם API Key של האפליקציה הנבחרת + JWT authentication
+    authenticatedFetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
       .then(res => res.json())
       .then(data => {
         setUsers(Array.isArray(data) ? data : []);
