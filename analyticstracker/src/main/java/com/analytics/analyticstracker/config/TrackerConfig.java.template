@@ -1,27 +1,28 @@
 package com.analytics.analyticstracker.config;
 
 /**
- * קובץ דוגמה לקונפיגורציה של AnalyticsTracker
+ * קובץ קונפיגורציה מרכזי עבור AnalyticsTracker
+ * כל ההגדרות הקבועות נמצאות כאן במקום אחד
  * 
- * ⚠️ חשוב: 
+ * ⚠️ חשוב: זהו קובץ TEMPLATE!
  * 1. העתק קובץ זה ל-TrackerConfig.java
- * 2. שנה את הערכים לערכים האמיתיים שלך
- * 3. הקובץ TrackerConfig.java לא יועלה לגיט (מוגן על ידי .gitignore)
+ * 2. החלף את הערכים בערכים האמיתיים שלך
+ * 3. אל תעלה את TrackerConfig.java ל-Git!
  */
 public class TrackerConfig {
-
+    
     /**
      * כתובת השרת הבסיסית
-     * שנה לכתובת השרת שלך
+     * החלף ב-IP או domain שלך
      */
     public static final String BASE_URL = "http://YOUR_SERVER_IP:8080/";
-
+    
     /**
-     * API Key ברירת מחדל
-     * שנה ל-API Key שלך מהדשבורד
+     * API Key של האפליקציה
+     * החלף ב-API Key שלך מהדשבורד
      */
     public static final String DEFAULT_API_KEY = "YOUR_API_KEY_HERE";
-
+    
     /**
      * הגדרות נוספות
      */
