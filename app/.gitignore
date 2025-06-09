@@ -1,6 +1,8 @@
 /build
 
 # Sensitive configuration files
+TrackerConfig.java
+**/TrackerConfig.java
 analyticstracker/src/main/java/com/analytics/analyticstracker/config/TrackerConfig.java
 app/local.properties
 local.properties
