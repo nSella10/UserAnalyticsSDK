@@ -24,6 +24,11 @@ Thumbs.db
 build/
 */build/
 
+# Temporary files
+.tmp/
+*.tmp
+temp/
+
 # Android files
 *.apk
 *.aab
