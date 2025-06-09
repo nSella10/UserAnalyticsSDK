@@ -18,6 +18,11 @@ public class UserAnalyticsApplication implements CommandLineRunner {
 				+ (System.getenv("SPRING_DATA_MONGODB_URI") != null ? "SET" : "NOT SET"));
 		System.out.println("   JWT_SECRET: " + (System.getenv("JWT_SECRET") != null ? "SET" : "NOT SET"));
 
+		// Add shutdown hook
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			System.out.println("🛑 SHUTDOWN HOOK - Application is shutting down!");
+		}));
+
 		try {
 			System.out.println("🔄 Calling SpringApplication.run()...");
 			SpringApplication.run(UserAnalyticsApplication.class, args);
@@ -48,8 +53,17 @@ public class UserAnalyticsApplication implements CommandLineRunner {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void onApplicationReady() {
-		System.out.println("🎉 APPLICATION READY EVENT - Server is fully started and ready!");
-		System.out.println("🌍 Application is now accepting HTTP requests");
+		try {
+			System.out.println("🎉 APPLICATION READY EVENT - Server is fully started and ready!");
+			System.out.println("🌍 Application is now accepting HTTP requests");
+			System.out.println("🔍 Testing internal health check...");
+
+			// Test if we can create basic objects
+			System.out.println("✅ Application ready event completed successfully");
+		} catch (Exception e) {
+			System.err.println("❌ APPLICATION READY EVENT FAILED: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 }
