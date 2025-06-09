@@ -1,26 +1,23 @@
-# Use OpenJDK 17 as base image
-FROM openjdk:17-jdk-slim
+# Multi-stage build for better optimization
+FROM gradle:8.11.1-jdk17 AS build
 
 # Set working directory
 WORKDIR /app
 
-# Copy gradle wrapper files from root (they work for backend too)
-COPY gradle/ ./gradle/
-COPY gradlew ./gradlew
-COPY gradlew.bat ./gradlew.bat
-
-# Copy backend gradle configuration files
-COPY backend/build.gradle ./build.gradle
-COPY backend/settings.gradle ./settings.gradle
-
-# Copy backend source code
-COPY backend/src/ ./src/
-
-# Make gradlew executable
-RUN chmod +x gradlew
+# Copy backend files
+COPY backend/ ./
 
 # Build the application (skip tests for faster build)
-RUN ./gradlew build -x test --no-daemon
+RUN gradle build -x test --no-daemon
+
+# Production stage
+FROM openjdk:17-jre-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy the built jar from build stage
+COPY --from=build /app/build/libs/*.jar app.jar
 
 # Expose port
 EXPOSE 8080
@@ -29,4 +26,4 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=prod
 
 # Run the application
-CMD ["java", "-jar", "build/libs/*.jar"]
+CMD ["java", "-jar", "app.jar"]
