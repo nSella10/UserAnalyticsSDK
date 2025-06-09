@@ -17,12 +17,13 @@ public class HealthController {
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
+        System.out.println("🏥 Health endpoint called - server is responding!");
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
         response.put("timestamp", LocalDateTime.now().toString());
         response.put("service", "User Analytics Backend");
         response.put("version", "1.0.0");
-        
+        System.out.println("✅ Health check successful - returning UP status");
         return ResponseEntity.ok(response);
     }
 
@@ -32,14 +33,14 @@ public class HealthController {
         response.put("message", "User Analytics API is running");
         response.put("status", "OK");
         response.put("timestamp", LocalDateTime.now().toString());
-        response.put("endpoints", new String[]{
-            "/health - Health check",
-            "/api/auth/register - User registration", 
-            "/api/auth/login - User login",
-            "/api/track - Track user actions",
-            "/api/screen-time - Track screen time"
+        response.put("endpoints", new String[] {
+                "/health - Health check",
+                "/api/auth/register - User registration",
+                "/api/auth/login - User login",
+                "/api/track - Track user actions",
+                "/api/screen-time - Track screen time"
         });
-        
+
         return ResponseEntity.ok(response);
     }
 }
