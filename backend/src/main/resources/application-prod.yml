@@ -1,0 +1,43 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/useranalytics}
+  
+  # CORS Configuration for production
+  web:
+    cors:
+      allowed-origins: ${CORS_ORIGINS:*}
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:default-secret-key-change-in-production}
+  expiration: 86400000 # 24 hours
+
+# Server Configuration
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,application/javascript,text/css
+
+# Logging Configuration
+logging:
+  level:
+    com.analytics: INFO
+    org.springframework: WARN
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Management endpoints for monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

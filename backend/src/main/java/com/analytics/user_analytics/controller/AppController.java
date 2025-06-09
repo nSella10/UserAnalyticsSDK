@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "${CORS_ORIGINS:*}"})
 @RestController
 @RequestMapping("/apps")
 public class AppController {

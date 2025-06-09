@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import SDKIntegrationCode from './SDKIntegrationCode';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 const AppSelector = ({ developer, onAppSelected, onCreateApp, onLogout }) => {
   const [apps, setApps] = useState([]);
@@ -21,7 +22,7 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp, onLogout }) => {
   const fetchApps = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:8080/apps/my-apps?developerEmail=${developer.email}`);
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.APPS_MY_APPS, { developerEmail: developer.email }));
 
       if (response.ok) {
         const data = await response.json();
@@ -47,7 +48,7 @@ const AppSelector = ({ developer, onAppSelected, onCreateApp, onLogout }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/apps/create', {
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.APPS_CREATE), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
