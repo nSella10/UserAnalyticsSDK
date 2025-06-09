@@ -26,4 +26,4 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=prod
 
 # Run the application
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-Dserver.port=${PORT:-8080}", "-jar", "app.jar"]
