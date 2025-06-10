@@ -7,11 +7,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-@SpringBootApplication(scanBasePackages = { "com.analytics.user_analytics.controller" }, exclude = {
-		org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration.class,
-		org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration.class,
-		org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration.class
-})
+@SpringBootApplication(scanBasePackages = { "com.analytics.user_analytics.controller.SimpleTestController" })
 public class UserAnalyticsApplication implements CommandLineRunner {
 
 	public static void main(String[] args) {
