@@ -8,9 +8,8 @@ This project uses Spring Boot profiles to manage different environments:
 
 ```
 backend/src/main/resources/
-├── application.properties              # Base configuration (shared)
-├── application-local.properties        # Local development (your computer)
-└── application-prod.properties         # Production (AWS Elastic Beanstalk)
+├── application.properties              # Production (AWS Elastic Beanstalk)
+└── application-local.properties        # Local development (your computer)
 ```
 
 ## 🏠 Local Development Setup
@@ -61,7 +60,7 @@ LOG_LEVEL_APP=INFO
 
 ### 2. Deploy
 
-The application will automatically use `application-prod.properties` and load values from environment variables.
+The application will automatically use `application.properties` and load values from environment variables.
 
 ## 🐳 Docker Deployment
 
@@ -76,8 +75,7 @@ SERVER_PORT=8080
 
 ## 🔒 Security Notes
 
-- ✅ **application.properties** - Safe to commit (no secrets)
-- ✅ **application-prod.properties** - Safe to commit (uses placeholders)
+- ✅ **application.properties** - Safe to commit (uses placeholders for AWS)
 - ❌ **application-local.properties** - DO NOT commit (contains actual secrets)
 
 ## 🧪 Testing Configuration
