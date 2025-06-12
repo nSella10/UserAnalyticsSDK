@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
+import { buildApiUrl, API_ENDPOINTS, authenticatedFetch } from '../config/api';
 
 const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory, selectedApp }) => {
   const [data, setData] = useState([]);
@@ -16,7 +17,11 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
   useEffect(() => {
     if (!selectedApp || !selectedApp.apiKey) return;
 
-    fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
+    const url = buildApiUrl(API_ENDPOINTS.TRACK_STATS_ALL_USERS, {
+      apiKey: selectedApp.apiKey
+    });
+
+    authenticatedFetch(url)
       .then(res => res.json())
       .then(users => {
         const map = {};
@@ -24,25 +29,33 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
           map[u.id] = `${u.firstName} ${u.lastName}`;
         });
         setUsersMap(map);
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
       });
   }, [selectedApp]);
 
   useEffect(() => {
-    if (viewMode !== 'category' && selectedApp && selectedApp.apiKey) {
-      const params = new URLSearchParams();
-      TimeRangeUtils.addTimeRangeToParams(params, timeRange);
-      params.append('apiKey', selectedApp.apiKey);
+    if (viewMode === 'category' || !selectedApp || !selectedApp.apiKey) return;
 
-      fetch(`http://localhost:8080/track/stats/by-category?${params}`)
-        .then(res => res.json())
-        .then(data => {
-          const options = Object.keys(data);
-          setCategories(options);
-          if (options.length > 0 && !options.includes(selectedCategory)) {
-            setSelectedCategory(options[0]);
-          }
-        });
-    }
+    const params = new URLSearchParams();
+    TimeRangeUtils.addTimeRangeToParams(params, timeRange);
+    params.append('apiKey', selectedApp.apiKey);
+
+    const url = buildApiUrl(API_ENDPOINTS.TRACK_STATS_BY_CATEGORY);
+
+    authenticatedFetch(`${url}?${params}`)
+      .then(res => res.json())
+      .then(data => {
+        const options = Object.keys(data);
+        setCategories(options);
+        if (options.length > 0 && !options.includes(selectedCategory)) {
+          setSelectedCategory(options[0]);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching categories:', error);
+      });
   }, [viewMode, timeRange, selectedApp]);
 
   useEffect(() => {
@@ -64,7 +77,9 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
         ? 'by-subcategory'
         : 'by-item';
 
-    fetch(`http://localhost:8080/track/stats/${endpoint}?${params}`)
+    const url = buildApiUrl(`/track/stats/${endpoint}`);
+
+    authenticatedFetch(`${url}?${params}`)
       .then(res => res.json())
       .then(rawData => {
         const grouped = {};
@@ -91,6 +106,10 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
         });
 
         setData(formatted);
+      })
+      .catch(error => {
+        console.error('Error fetching chart data:', error);
+        setData([]);
       });
   }, [viewMode, selectedUsers, selectedCategory, timeRange, selectedApp]);
 

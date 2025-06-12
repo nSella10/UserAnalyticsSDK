@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
+import { buildApiUrl, API_ENDPOINTS, authenticatedFetch } from '../config/api';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#bb6bd9', '#f44336', '#4caf50', '#e91e63'];
 
@@ -19,9 +20,12 @@ function CategoryPieChart({ selectedUsers }) {
         // הוספת פרמטרים של טווח זמן
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
 
-        fetch(`http://localhost:8080/track/stats/by-category?${params}`)
+        const url = buildApiUrl(API_ENDPOINTS.TRACK_STATS_BY_CATEGORY);
+
+        authenticatedFetch(`${url}?${params}`)
             .then(res => res.json())
             .then(json => {
+                console.log('📊 Category pie chart data:', json);
                 const formatted = Object.entries(json).map(([category, count]) => ({
                     name: category,
                     value: count
@@ -32,7 +36,11 @@ function CategoryPieChart({ selectedUsers }) {
                 setTotal(totalActions);
                 setData(formatted);
             })
-            .catch(console.error);
+            .catch(error => {
+                console.error('❌ Error fetching category data:', error);
+                setData([]);
+                setTotal(0);
+            });
     }, [selectedUsers, timeRange]);
 
     const CustomTooltip = ({ active, payload }) => {

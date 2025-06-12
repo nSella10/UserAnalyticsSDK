@@ -5,6 +5,7 @@ import CategoryBarChart from './components/CategoryBarChart';
 import MultiPieCharts from './components/MultiPieCharts';
 import DeveloperAuth from './components/DeveloperAuth';
 import AppSelector from './components/AppSelector';
+import TimeRangeFilter from './components/TimeRangeFilter';
 
 function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);

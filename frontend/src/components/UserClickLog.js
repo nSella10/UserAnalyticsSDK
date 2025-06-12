@@ -1,54 +1,8 @@
-//import React, { useEffect, useState } from 'react';
-//
-//function UserClickLog({ userId }) {
-//    const [logs, setLogs] = useState([]);
-//
-//
-//    useEffect(() => {
-//        if (!userId) return;
-//        fetch(`http://localhost:8080/track/stats/logs?userId=${userId}`)
-//            .then(res => res.json())
-//            .then(data => setLogs(data))
-//            .catch(err => console.error("Error fetching logs:", err));
-//    }, [userId]);
-//
-//    return (
-//        <div style={{ marginTop: '40px' }}>
-//            <h2>📜 User Action Logs</h2>
-//            {logs.length === 0 ? (
-//                <p>No actions found.</p>
-//            ) : (
-//                <table border="1" cellPadding="10">
-//                    <thead>
-//                        <tr>
-//                            <th>Time</th>
-//                            <th>Action</th>
-//                            <th>Category</th>
-//                            <th>Subcategory</th>
-//                            <th>Item</th>
-//                        </tr>
-//                    </thead>
-//                    <tbody>
-//                        {logs.map((log, index) => (
-//                            <tr key={index}>
-//                                <td>{new Date(log.timestamp).toLocaleString()}</td>
-//                                <td>{log.actionName}</td>
-//                                <td>{log.properties?.category || '-'}</td>
-//                                <td>{log.properties?.subcategory || '-'}</td>
-//                                <td>{log.properties?.item || '-'}</td>
-//                            </tr>
-//                        ))}
-//                    </tbody>
-//                </table>
-//            )}
-//        </div>
-//    );
-//}
-//
-//export default UserClickLog;
+
 import React, { useEffect, useState } from 'react';
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
+import { buildApiUrl, API_ENDPOINTS, authenticatedFetch } from '../config/api';
 
 function UserClickLog({ userId: initialUserId, selectedUserIds = [], selectedApp }) {
     const [logs, setLogs] = useState([]);
@@ -80,10 +34,14 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [], selectedApp
     useEffect(() => {
         if (!selectedApp || !selectedApp.apiKey) return;
 
-        fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
+        const url = buildApiUrl(API_ENDPOINTS.TRACK_STATS_ALL_USERS, {
+            apiKey: selectedApp.apiKey
+        });
+
+        authenticatedFetch(url)
             .then(res => res.json())
             .then(data => setUsers(data))
-            .catch(err => console.error("Error fetching users:", err));
+            .catch(err => console.error("❌ Error fetching users:", err));
     }, [selectedApp]);
 
     // שליפת הפעולות לפי יוזר
@@ -103,31 +61,34 @@ function UserClickLog({ userId: initialUserId, selectedUserIds = [], selectedApp
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
 
         // טען לוגים וסנן את שורות SCREEN_DURATION
-        fetch(`http://localhost:8080/track/stats/logs?${params.toString()}`)
+        const logsUrl = buildApiUrl('/track/stats/logs');
+        authenticatedFetch(`${logsUrl}?${params.toString()}`)
             .then(res => res.json())
             .then(data => {
-                console.log('Received logs:', data.length, 'items for timeRange:', timeRange);
+                console.log('📋 Received logs:', data.length, 'items for timeRange:', timeRange);
                 // סינון שורות SCREEN_DURATION
                 const filteredLogs = data.filter(log => log.actionName !== 'screen_duration');
                 setLogs(filteredLogs);
             })
-            .catch(err => console.error("Error fetching logs:", err));
+            .catch(err => console.error("❌ Error fetching logs:", err));
 
         // טען סיכום זמני מסך
         const summaryParams = new URLSearchParams();
         summaryParams.append('apiKey', selectedApp.apiKey);
         TimeRangeUtils.addTimeRangeToParams(summaryParams, timeRange);
 
-        fetch(`http://localhost:8080/screen-time/user-screen-summary/${currentUserId}?${summaryParams.toString()}`)
+        const screenSummaryUrl = buildApiUrl(`/screen-time/user-screen-summary/${currentUserId}`);
+        authenticatedFetch(`${screenSummaryUrl}?${summaryParams.toString()}`)
             .then(res => res.json())
             .then(data => {
+                console.log('⏱️ Screen summary data:', data);
                 // סינון קטגוריית "אחר" מהתוצאות
                 if (data && data.categories) {
                     data.categories = data.categories.filter(category => category.category !== 'אחר');
                 }
                 setScreenSummary(data);
             })
-            .catch(err => console.error("Error fetching screen summary:", err));
+            .catch(err => console.error("❌ Error fetching screen summary:", err));
 
         // מצא את היוזר להצגה
         const user = users.find(u => u.id === currentUserId);

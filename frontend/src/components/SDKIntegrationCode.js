@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // אתחול ה-SDK עם URL השרת וה-API Key שלך
-        AnalyticsTracker.init("http://localhost:8080/", "${app.apiKey}");
+        AnalyticsTracker.init("${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/", "${app.apiKey}");
 
         // דוגמה לשליחת אירוע
         Map<String, Object> properties = new HashMap<>();
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
               </div>
               <div className="flex items-start">
                 <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">3</span>
-                <p className="text-right flex-1">החלף את "http://localhost:8080/" ב-URL של השרת שלך (אם רלוונטי)</p>
+                <p className="text-right flex-1">ה-URL יעודכן אוטומטיט לפי הסביבה (AWS או localhost)</p>
               </div>
               <div className="flex items-start">
                 <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">4</span>

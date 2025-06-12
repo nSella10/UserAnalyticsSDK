@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import TimeRangeFilter from './TimeRangeFilter';
 import TimeRangeUtils from '../utils/TimeRangeUtils';
+import { buildApiUrl, API_ENDPOINTS, authenticatedFetch } from '../config/api';
 
 const COLORS = [
     '#3B82F6', '#8B5CF6', '#10B981', '#F59E0B',
@@ -44,7 +45,11 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
     useEffect(() => {
         if (!selectedApp || !selectedApp.apiKey) return;
 
-        fetch(`http://localhost:8080/track/stats/all-users?apiKey=${selectedApp.apiKey}`)
+        const url = buildApiUrl(API_ENDPOINTS.TRACK_STATS_ALL_USERS, {
+            apiKey: selectedApp.apiKey
+        });
+
+        authenticatedFetch(url)
             .then(res => res.json())
             .then(users => {
                 const map = {};
@@ -53,7 +58,9 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                 });
                 setUsersMap(map);
             })
-            .catch(console.error);
+            .catch(error => {
+                console.error('❌ Error fetching users:', error);
+            });
     }, [selectedApp]);
 
     // שליפת נתוני קטגוריות
@@ -70,7 +77,8 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
         params.append('apiKey', selectedApp.apiKey);
 
-        fetch(`http://localhost:8080/track/stats/by-category?${params}`)
+        const categoryUrl = buildApiUrl(API_ENDPOINTS.TRACK_STATS_BY_CATEGORY);
+        authenticatedFetch(`${categoryUrl}?${params}`)
             .then(res => res.json())
             .then(json => {
                 const formatted = Object.entries(json).map(([category, count]) => ({
@@ -122,7 +130,8 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
         params.append('apiKey', selectedApp.apiKey);
 
-        fetch(`http://localhost:8080/track/stats/by-subcategory?${params}`)
+        const subcategoryUrl = buildApiUrl('/track/stats/by-subcategory');
+        authenticatedFetch(`${subcategoryUrl}?${params}`)
             .then(res => res.json())
             .then(data => {
                 let formatted;
@@ -200,7 +209,8 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);
         params.append('apiKey', selectedApp.apiKey);
 
-        fetch(`http://localhost:8080/track/stats/by-item?${params}`)
+        const itemUrl = buildApiUrl('/track/stats/by-item');
+        authenticatedFetch(`${itemUrl}?${params}`)
             .then(res => res.json())
             .then(data => {
                 let formatted;

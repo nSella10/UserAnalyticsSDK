@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 function DeveloperAuth({ onAuthSuccess }) {
     const [isLogin, setIsLogin] = useState(true);
@@ -28,7 +29,9 @@ function DeveloperAuth({ onAuthSuccess }) {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8080/developers/login', {
+            const response = await fetch(
+                buildApiUrl(API_ENDPOINTS.DEVELOPER_LOGIN),
+                {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -74,7 +77,9 @@ function DeveloperAuth({ onAuthSuccess }) {
         }
 
         try {
-            const response = await fetch('http://localhost:8080/developers/register', {
+            const response = await fetch(
+                buildApiUrl(API_ENDPOINTS.DEVELOPER_REGISTER),
+                {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

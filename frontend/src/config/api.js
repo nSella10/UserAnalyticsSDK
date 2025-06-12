@@ -9,9 +9,14 @@ const getApiUrl = () => {
   if (process.env.REACT_APP_API_URL) {
     return process.env.REACT_APP_API_URL;
   }
-  
-  // Fallback to localhost for development
-  return 'http://localhost:8080';
+
+  // Use AWS Elastic Beanstalk URL for production
+  if (process.env.NODE_ENV === 'production') {
+    return 'http://user-analytics-backend-env.eba-kc7wz3xt.eu-north-1.elasticbeanstalk.com';
+  }
+
+  // Use AWS backend for now (fallback)
+  return 'http://user-analytics-backend-env.eba-kc7wz3xt.eu-north-1.elasticbeanstalk.com';
 };
 
 // Export the base API URL
