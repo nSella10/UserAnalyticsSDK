@@ -5,7 +5,6 @@ import CategoryBarChart from './components/CategoryBarChart';
 import MultiPieCharts from './components/MultiPieCharts';
 import DeveloperAuth from './components/DeveloperAuth';
 import AppSelector from './components/AppSelector';
-import TimeRangeFilter from './components/TimeRangeFilter';
 
 function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -14,7 +13,6 @@ function App() {
   const [developer, setDeveloper] = useState(null);
   const [selectedApp, setSelectedApp] = useState(null);
   const [showAppSelector, setShowAppSelector] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
 
   // בדיקה אם המפתח כבר מחובר
   useEffect(() => {
@@ -124,7 +122,7 @@ function App() {
         }}></div>
       </div>
 
-      <div className="relative grid grid-cols-1 lg:grid-cols-[320px_1fr] min-h-screen">
+      <div className="relative grid grid-cols-1 lg:grid-cols-[280px_1fr] min-h-screen">
         {/* Sidebar */}
         <aside className="lg:sticky lg:top-0 lg:h-screen">
           <UserListPanel

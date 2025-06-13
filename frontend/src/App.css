@@ -3,7 +3,7 @@
 /* Main Dashboard Container */
 .dashboard-container {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 280px 1fr;
   min-height: 100vh;
   background: var(--bg-secondary);
   font-family: var(--font-family-primary);
@@ -14,7 +14,7 @@
 /* Responsive Grid */
 @media (max-width: 1024px) {
   .dashboard-container {
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 260px 1fr;
   }
 }
 

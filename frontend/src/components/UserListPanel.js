@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { authenticatedFetch,buildApiUrl, API_ENDPOINTS } from '../config/api';
+import { authenticatedFetch, buildApiUrl, API_ENDPOINTS } from '../config/api';
 
 function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selectedApp }) {
   const [users, setUsers] = useState([]);
@@ -60,9 +60,9 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selec
   return (
     <div className="h-full flex flex-col bg-white/80 backdrop-blur-sm border-r border-gray-200 shadow-lg">
       {/* Header */}
-      <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
-        <h2 className="text-xl font-bold text-gray-800 flex items-center gap-3">
-          <span className="text-2xl">👥</span>
+      <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <span className="text-xl">👥</span>
           Users
           {selectedCount > 0 && (
             <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-semibold px-3 py-1 rounded-full min-w-[24px] h-6 flex items-center justify-center animate-pulse-slow shadow-lg">
@@ -113,7 +113,7 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selec
       </div>
 
       {/* Users List */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-3">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-500 rounded-full animate-spin mb-4"></div>
@@ -138,7 +138,7 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selec
               <li key={user.id} className="animate-fade-in">
                 <button
                   onClick={() => handleToggleUser(user.id)}
-                  className={`w-full p-4 rounded-xl transition-all duration-200 flex items-center gap-4 text-left group relative overflow-hidden ${isSelected(user.id)
+                  className={`w-full p-3 rounded-lg transition-all duration-200 flex items-center gap-3 text-left group relative overflow-hidden ${isSelected(user.id)
                     ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 shadow-md transform scale-[1.02]'
                     : 'bg-white/70 border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md hover:transform hover:scale-[1.01]'
                     }`}
@@ -156,7 +156,7 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selec
 
                   {/* User Info */}
                   <div className="flex-1 min-w-0 relative z-10">
-                    <div className={`font-semibold text-sm truncate ${isSelected(user.id) ? 'text-blue-800' : 'text-gray-800'
+                    <div className={`font-semibold text-xs truncate ${isSelected(user.id) ? 'text-blue-800' : 'text-gray-800'
                       }`}>
                       {user.firstName} {user.lastName}
                     </div>
@@ -167,7 +167,7 @@ function UserListPanel({ onUserSelect, selectUserIds = [], refreshTrigger, selec
 
                   {/* Selected Indicator */}
                   {isSelected(user.id) && (
-                    <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md animate-bounce-subtle">
+                    <div className="w-5 h-5 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-md animate-bounce-subtle">
                       ✓
                     </div>
                   )}

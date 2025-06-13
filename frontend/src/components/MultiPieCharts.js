@@ -34,12 +34,119 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubcategory, setSelectedSubcategory] = useState(null);
     const [totals, setTotals] = useState({ category: 0, subcategory: 0, item: 0 });
-    const [usersMap, setUsersMap] = useState({});
+    const [setUsersMap] = useState({});
     const [loading, setLoading] = useState({ category: false, subcategory: false, item: false });
     const [timeRange, setTimeRange] = useState('all'); // 'all', 'day', 'week', 'month'
+    const [screenSize, setScreenSize] = useState({
+        width: typeof window !== 'undefined' ? window.innerWidth : 1200,
+        height: typeof window !== 'undefined' ? window.innerHeight : 800
+    });
+
+    // Track screen size for responsive design
+    useEffect(() => {
+        const handleResize = () => {
+            setScreenSize({
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // פונקציה לחישוב סך הכל
     const calculateTotal = (data) => data.reduce((sum, item) => sum + item.value, 0);
+
+    // Responsive chart dimensions
+    const getResponsiveSettings = () => {
+        const width = screenSize.width;
+        const height = screenSize.height;
+
+        if (width < 480) { // Small Mobile
+            return {
+                height: 320,
+                outerRadius: 50,
+                cx: "50%",
+                cy: "45%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        } else if (width < 640) { // Mobile Portrait
+            return {
+                height: 380,
+                outerRadius: 65,
+                cx: "50%",
+                cy: "42%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        } else if (width < 768) { // Mobile Landscape / Small Tablet
+            return {
+                height: 420,
+                outerRadius: 75,
+                cx: "50%",
+                cy: "40%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        } else if (width < 1024) { // Tablet
+            return {
+                height: 460,
+                outerRadius: 85,
+                cx: "50%",
+                cy: "38%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        } else if (width < 1200) { // Small Desktop (like your 1080px screen)
+            return {
+                height: 500,
+                outerRadius: 95,
+                cx: "50%",
+                cy: "36%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        } else if (width < 1440) { // Medium Desktop
+            return {
+                height: 540,
+                outerRadius: 105,
+                cx: "50%",
+                cy: "34%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        } else if (width < 1920) { // Large Desktop
+            return {
+                height: 580,
+                outerRadius: 115,
+                cx: "50%",
+                cy: "32%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        } else { // Extra Large Desktop (4K and above)
+            return {
+                height: 620,
+                outerRadius: 125,
+                cx: "50%",
+                cy: "30%",
+                legendLayout: "horizontal",
+                legendAlign: "center",
+                legendVerticalAlign: "bottom"
+            };
+        }
+    };
+
+    const responsiveSettings = getResponsiveSettings();
 
     // שליפת שמות המשתמשים
     useEffect(() => {
@@ -396,7 +503,7 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                         <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
                             🔍
                         </div>
-                        <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        <h2 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                             Hierarchical Analysis
                         </h2>
                     </div>
@@ -411,9 +518,9 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
             </div>
 
             {/* Charts Container */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="w-full grid -cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-3 md:gap-4 lg:gap-6 xl:gap-8">
                 {/* Categories Chart */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden">
+                <div className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-3 md:p-4 lg:p-6 xl:p-8 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden min-h-[380px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[500px] xl:min-h-[540px] 2xl:min-h-[580px]">
                     {/* Animated background gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -422,7 +529,7 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-sm shadow-lg">
                                 📊
                             </div>
-                            <h3 className="text-xl font-bold text-gray-800">Categories</h3>
+                            <h3 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-800">Categories</h3>
                             <div className="flex-1"></div>
                             <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
                         </div>
@@ -449,48 +556,50 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                                         </span>
                                     )}
                                 </div>
-                                <ResponsiveContainer width="100%" height={250}>
-                                    <PieChart>
-                                        <Pie
-                                            data={categoryData}
-                                            cx="50%"
-                                            cy="50%"
-                                            labelLine={false}
-                                            label={renderCustomizedLabel}
-                                            outerRadius={80}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            animationDuration={800}
-                                            onClick={(data) => {
-                                                setSelectedCategory(data.name);
-                                                setSelectedSubcategory(null);
-                                            }}
-                                        >
-                                            {categoryData.map((entry, index) => (
-                                                <Cell
-                                                    key={`cell-${index}`}
-                                                    fill={COLORS[index % COLORS.length]}
-                                                    stroke={entry.name === selectedCategory ? '#000' : 'none'}
-                                                    strokeWidth={entry.name === selectedCategory ? 2 : 0}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip content={<CustomTooltip chartType="category" />} />
-                                        <Legend
-                                            content={<CustomLegend chartType="category" />}
-                                            layout="vertical"
-                                            verticalAlign="middle"
-                                            align="right"
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                <div className="w-full overflow-hidden">
+                                    <ResponsiveContainer width="100%" height={responsiveSettings.height} minWidth={0}>
+                                        <PieChart>
+                                            <Pie
+                                                data={categoryData}
+                                                cx={responsiveSettings.cx}
+                                                cy={responsiveSettings.cy}
+                                                labelLine={false}
+                                                label={renderCustomizedLabel}
+                                                outerRadius={responsiveSettings.outerRadius}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                animationDuration={800}
+                                                onClick={(data) => {
+                                                    setSelectedCategory(data.name);
+                                                    setSelectedSubcategory(null);
+                                                }}
+                                            >
+                                                {categoryData.map((entry, index) => (
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={COLORS[index % COLORS.length]}
+                                                        stroke={entry.name === selectedCategory ? '#000' : 'none'}
+                                                        strokeWidth={entry.name === selectedCategory ? 2 : 0}
+                                                    />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip content={<CustomTooltip chartType="category" />} />
+                                            <Legend
+                                                content={<CustomLegend chartType="category" />}
+                                                layout={responsiveSettings.legendLayout}
+                                                verticalAlign={responsiveSettings.legendVerticalAlign}
+                                                align={responsiveSettings.legendAlign}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Subcategories Chart */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden">
+                <div className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-3 md:p-4 lg:p-6 xl:p-8 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden min-h-[380px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[500px] xl:min-h-[540px] 2xl:min-h-[580px]">
                     {/* Animated background gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-pink-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -499,14 +608,9 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                             <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-white text-sm shadow-lg">
                                 🏷️
                             </div>
-                            <h3 className="text-xl font-bold text-gray-800">Subcategories</h3>
+                            <h3 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-800">Subcategories</h3>
                             <div className="flex-1"></div>
                             <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                            {selectedCategory && (
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
-                                    {selectedCategory}
-                                </span>
-                            )}
                         </div>
 
                         {loading.subcategory ? (
@@ -531,47 +635,49 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                                         </span>
                                     )}
                                 </div>
-                                <ResponsiveContainer width="100%" height={250}>
-                                    <PieChart>
-                                        <Pie
-                                            data={subcategoryData}
-                                            cx="50%"
-                                            cy="50%"
-                                            labelLine={false}
-                                            label={renderCustomizedLabel}
-                                            outerRadius={80}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            animationDuration={800}
-                                            onClick={(data) => {
-                                                setSelectedSubcategory(data.name);
-                                            }}
-                                        >
-                                            {subcategoryData.map((entry, index) => (
-                                                <Cell
-                                                    key={`cell-${index}`}
-                                                    fill={COLORS[index % COLORS.length]}
-                                                    stroke={entry.name === selectedSubcategory ? '#000' : 'none'}
-                                                    strokeWidth={entry.name === selectedSubcategory ? 2 : 0}
-                                                />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip content={<CustomTooltip chartType="subcategory" />} />
-                                        <Legend
-                                            content={<CustomLegend chartType="subcategory" />}
-                                            layout="vertical"
-                                            verticalAlign="middle"
-                                            align="right"
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                <div className="w-full overflow-hidden">
+                                    <ResponsiveContainer width="100%" height={responsiveSettings.height} minWidth={0}>
+                                        <PieChart>
+                                            <Pie
+                                                data={subcategoryData}
+                                                cx={responsiveSettings.cx}
+                                                cy={responsiveSettings.cy}
+                                                labelLine={false}
+                                                label={renderCustomizedLabel}
+                                                outerRadius={responsiveSettings.outerRadius}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                animationDuration={800}
+                                                onClick={(data) => {
+                                                    setSelectedSubcategory(data.name);
+                                                }}
+                                            >
+                                                {subcategoryData.map((entry, index) => (
+                                                    <Cell
+                                                        key={`cell-${index}`}
+                                                        fill={COLORS[index % COLORS.length]}
+                                                        stroke={entry.name === selectedSubcategory ? '#000' : 'none'}
+                                                        strokeWidth={entry.name === selectedSubcategory ? 2 : 0}
+                                                    />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip content={<CustomTooltip chartType="subcategory" />} />
+                                            <Legend
+                                                content={<CustomLegend chartType="subcategory" />}
+                                                layout={responsiveSettings.legendLayout}
+                                                verticalAlign={responsiveSettings.legendVerticalAlign}
+                                                align={responsiveSettings.legendAlign}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Items Chart */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden">
+                <div className="w-full bg-white/90 backdrop-blur-sm rounded-3xl p-3 md:p-4 lg:p-6 xl:p-8 border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-[1.02] group relative overflow-hidden min-h-[450px] md:min-h-[550px] lg:min-h-[650px] xl:min-h-[800px]">
                     {/* Animated background gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-teal-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
@@ -580,14 +686,9 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                             <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white text-sm shadow-lg">
                                 📦
                             </div>
-                            <h3 className="text-xl font-bold text-gray-800">Items</h3>
+                            <h3 className="text-lg md:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-800">Items</h3>
                             <div className="flex-1"></div>
                             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                            {selectedSubcategory && (
-                                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
-                                    {selectedSubcategory}
-                                </span>
-                            )}
                         </div>
 
                         {loading.item ? (
@@ -612,39 +713,40 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
                                         </span>
                                     )}
                                 </div>
-                                <ResponsiveContainer width="100%" height={250}>
-                                    <PieChart>
-                                        <Pie
-                                            data={itemData}
-                                            cx="50%"
-                                            cy="50%"
-                                            labelLine={false}
-                                            label={renderCustomizedLabel}
-                                            outerRadius={80}
-                                            fill="#8884d8"
-                                            dataKey="value"
-                                            animationDuration={800}
-                                        >
-                                            {itemData.map((_, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip content={<CustomTooltip chartType="item" />} />
-                                        <Legend
-                                            content={<CustomLegend chartType="item" />}
-                                            layout="vertical"
-                                            verticalAlign="middle"
-                                            align="right"
-                                        />
-                                    </PieChart>
-                                </ResponsiveContainer>
+                                <div className="w-full overflow-hidden">
+                                    <ResponsiveContainer width="100%" height={responsiveSettings.height} minWidth={0}>
+                                        <PieChart>
+                                            <Pie
+                                                data={itemData}
+                                                cx={responsiveSettings.cx}
+                                                cy={responsiveSettings.cy}
+                                                labelLine={false}
+                                                label={renderCustomizedLabel}
+                                                outerRadius={responsiveSettings.outerRadius}
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                animationDuration={800}
+                                            >
+                                                {itemData.map((_, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip content={<CustomTooltip chartType="item" />} />
+                                            <Legend
+                                                content={<CustomLegend chartType="item" />}
+                                                layout={responsiveSettings.legendLayout}
+                                                verticalAlign={responsiveSettings.legendVerticalAlign}
+                                                align={responsiveSettings.legendAlign}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
         </div>
-
     );
 }
 

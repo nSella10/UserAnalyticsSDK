@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = { "http://localhost:3000"})
+@CrossOrigin(origins = { "http://localhost:3000","http://my-react-frontend-bucket1.s3-website.eu-north-1.amazonaws.com" })
 @RestController
 @RequestMapping("/track")
 public class UserActionController {
