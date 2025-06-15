@@ -34,7 +34,7 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedSubcategory, setSelectedSubcategory] = useState(null);
     const [totals, setTotals] = useState({ category: 0, subcategory: 0, item: 0 });
-    const [setUsersMap] = useState({});
+    const [usersMap, setUsersMap] = useState({});
     const [loading, setLoading] = useState({ category: false, subcategory: false, item: false });
     const [timeRange, setTimeRange] = useState('all'); // 'all', 'day', 'week', 'month'
     const [screenSize, setScreenSize] = useState({
@@ -231,7 +231,7 @@ function MultiPieCharts({ selectedUsers, selectedApp }) {
         }
 
         // הוסף את הקטגוריה הנבחרת לפרמטרים (חובה)
-        params.append('category', selectedCategory);
+        params.append('category',selectedCategory);
 
         // הוספת פרמטרים של טווח זמן
         TimeRangeUtils.addTimeRangeToParams(params, timeRange);

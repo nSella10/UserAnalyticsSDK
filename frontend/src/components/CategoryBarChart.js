@@ -61,6 +61,11 @@ const CategoryBarChart = ({ selectedUsers, selectedCategory, setSelectedCategory
   useEffect(() => {
     if (!selectedApp || !selectedApp.apiKey) return;
 
+    if ((viewMode === 'subcategory' || viewMode === 'item') && !selectedCategory) {
+      console.warn('No category selected yet – skipping fetch');
+      return;
+    }
+
     const params = new URLSearchParams();
     selectedUsers.forEach(id => params.append('userIds', id));
     if (selectedCategory && viewMode !== 'category') {

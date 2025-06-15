@@ -129,15 +129,29 @@ public class UserActionController {
                         @RequestParam(required = false) List<String> userIds,
                         @RequestParam(required = false) String apiKey) {
 
+                String cleanedCategory = category.trim().toLowerCase();
                 boolean hasUserFilter = userIds != null && !userIds.isEmpty();
 
+                System.out.println("📥 Received category: [" + category + "]");
+                System.out.println("🔍 Normalized: [" + cleanedCategory + "]");
+                System.out.println("🔎 Available categories in DB:");
+
+                repository.findAll().stream()
+                                .filter(action -> "click_subcategory".equals(action.getActionName()))
+                                .map(action -> action.getProperties().get("category").toString().trim().toLowerCase())
+                                .distinct()
+                                .sorted()
+                                .forEach(cat -> System.out.println("🔸 " + cat));
+
                 if (!hasUserFilter) {
-                        // החזר מבנה פשוט אם אין יוזרים מסוננים
                         return repository.findAll().stream()
                                         .filter(action -> "click_subcategory".equals(action.getActionName()) &&
                                                         action.getProperties() != null &&
-                                                        category.equals(action.getProperties().get("category")) &&
+                                                        action.getProperties().containsKey("category") &&
                                                         action.getProperties().containsKey("subcategory") &&
+                                                        cleanedCategory.equals(action.getProperties().get("category")
+                                                                        .toString().trim().toLowerCase())
+                                                        &&
                                                         isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                         (apiKey == null || apiKey.equals(action.getApiKey())))
                                         .collect(Collectors.groupingBy(
@@ -145,12 +159,14 @@ public class UserActionController {
                                                         Collectors.counting()));
                 }
 
-                // אם כן יש יוזרים מסוננים — מחזיר רשימה של אובייקטים עם שדות
                 return repository.findAll().stream()
                                 .filter(action -> "click_subcategory".equals(action.getActionName()) &&
                                                 action.getProperties() != null &&
-                                                category.equals(action.getProperties().get("category")) &&
+                                                action.getProperties().containsKey("category") &&
                                                 action.getProperties().containsKey("subcategory") &&
+                                                cleanedCategory.equals(action.getProperties().get("category").toString()
+                                                                .trim().toLowerCase())
+                                                &&
                                                 isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
                                                 userIds.contains(action.getUserId()) &&
                                                 (apiKey == null || apiKey.equals(action.getApiKey())))
@@ -167,7 +183,56 @@ public class UserActionController {
                                         return result;
                                 })
                                 .collect(Collectors.toList());
-        }
+        }        
+
+
+        // @GetMapping("/stats/by-subcategory")
+        // public Object getClicksBySubcategory(
+        //                 @RequestParam String category,
+        //                 @RequestParam(required = false) String fromDate,
+        //                 @RequestParam(required = false) String toDate,
+        //                 @RequestParam(required = false) List<String> userIds,
+        //                 @RequestParam(required = false) String apiKey) {
+
+        //         boolean hasUserFilter = userIds != null && !userIds.isEmpty();
+
+        //         if (!hasUserFilter) {
+        //                 // החזר מבנה פשוט אם אין יוזרים מסוננים
+        //                 return repository.findAll().stream()
+        //                                 .filter(action -> "click_subcategory".equals(action.getActionName()) &&
+        //                                                 action.getProperties() != null &&
+        //                                                 category.equals(action.getProperties().get("category")) &&
+        //                                                 action.getProperties().containsKey("subcategory") &&
+        //                                                 isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
+        //                                                 (apiKey == null || apiKey.equals(action.getApiKey())))
+        //                                 .collect(Collectors.groupingBy(
+        //                                                 action -> action.getProperties().get("subcategory").toString(),
+        //                                                 Collectors.counting()));
+        //         }
+
+        //         // אם כן יש יוזרים מסוננים — מחזיר רשימה של אובייקטים עם שדות
+        //         return repository.findAll().stream()
+        //                         .filter(action -> "click_subcategory".equals(action.getActionName()) &&
+        //                                         action.getProperties() != null &&
+        //                                         category.equals(action.getProperties().get("category")) &&
+        //                                         action.getProperties().containsKey("subcategory") &&
+        //                                         isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
+        //                                         userIds.contains(action.getUserId()) &&
+        //                                         (apiKey == null || apiKey.equals(action.getApiKey())))
+        //                         .collect(Collectors.groupingBy(
+        //                                         action -> Map.of(
+        //                                                         "subcategory",
+        //                                                         action.getProperties().get("subcategory").toString(),
+        //                                                         "userId", action.getUserId()),
+        //                                         Collectors.counting()))
+        //                         .entrySet().stream()
+        //                         .map(entry -> {
+        //                                 Map<String, Object> result = new HashMap<>(entry.getKey());
+        //                                 result.put("count", entry.getValue());
+        //                                 return result;
+        //                         })
+        //                         .collect(Collectors.toList());
+        // }
 
         @GetMapping("/stats/by-item")
         public Object getClicksByItem(
