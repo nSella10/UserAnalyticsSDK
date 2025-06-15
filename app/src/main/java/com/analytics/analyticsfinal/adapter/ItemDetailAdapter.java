@@ -18,10 +18,7 @@ import java.util.Map;
 
 public class ItemDetailAdapter extends RecyclerView.Adapter<ItemDetailAdapter.ItemViewHolder> {
 
-//    public interface OnItemClickListener {
-//        void onItemClick(ItemDetail item);
-//
-//    }
+
 
     private final Context context;
     private final List<ItemDetail> items;

@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/screen-time")
-@CrossOrigin(origins = "*")
 public class ScreenTimeController {
 
     @Autowired

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = {"http://localhost:3000","http://my-react-frontend-bucket1.s3-website.eu-north-1.amazonaws.com"})
 @RestController
 @RequestMapping("/apps")
 public class AppController {

@@ -3,35 +3,29 @@
  * Handles environment-specific API URLs and authentication
  */
 
-// Get API URL from environment variables or use default
+// frontend/src/config/api.js
+
 const getApiUrl = () => {
-  // Check for environment variable first
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
+  const url = process.env.REACT_APP_API_URL;
+  if (!url) {
+    throw new Error('Missing REACT_APP_API_URL!');
   }
-
-  // Use AWS Elastic Beanstalk URL for production
-  if (process.env.NODE_ENV === 'production') {
-    return 'http://user-analytics-backend-env.eba-kc7wz3xt.eu-north-1.elasticbeanstalk.com';
-  }
-
-  // Use AWS backend for now (fallback)
-  return 'http://user-analytics-backend-env.eba-kc7wz3xt.eu-north-1.elasticbeanstalk.com';
+  return url;
 };
 
-// Export the base API URL
 export const API_BASE_URL = getApiUrl();
+
 
 // API endpoints configuration
 export const API_ENDPOINTS = {
   // Developer authentication
   DEVELOPER_LOGIN: '/developers/login',
   DEVELOPER_REGISTER: '/developers/register',
-  
+
   // Application management
   APPS_MY_APPS: '/apps/my-apps',
   APPS_CREATE: '/apps/create',
-  
+
   // Analytics tracking
   TRACK: '/track',
   TRACK_STATS_COUNT: '/track/stats/count',
@@ -39,10 +33,10 @@ export const API_ENDPOINTS = {
   TRACK_STATS_BY_USER_BY_DATE: '/track/stats/by-user/by-date',
   TRACK_STATS_BY_DATE: '/track/stats/by-date',
   TRACK_STATS_BY_CATEGORY: '/track/stats/by-category',
-  
+
   // Screen time
   SCREEN_TIME: '/screen-time',
-  
+
   // Health check
   HEALTH: '/health'
 };
@@ -50,7 +44,7 @@ export const API_ENDPOINTS = {
 // Helper function to build full URL
 export const buildApiUrl = (endpoint, params = {}) => {
   let url = `${API_BASE_URL}${endpoint}`;
-  
+
   // Add query parameters if provided
   if (Object.keys(params).length > 0) {
     const searchParams = new URLSearchParams();
@@ -59,12 +53,12 @@ export const buildApiUrl = (endpoint, params = {}) => {
         searchParams.append(key, value);
       }
     });
-    
+
     if (searchParams.toString()) {
       url += `?${searchParams.toString()}`;
     }
   }
-  
+
   return url;
 };
 
@@ -79,18 +73,18 @@ export const getAuthHeaders = () => {
   const headers = {
     'Content-Type': 'application/json',
   };
-  
+
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   return headers;
 };
 
 // Helper function for authenticated API calls
 export const authenticatedFetch = async (url, options = {}) => {
   const authHeaders = getAuthHeaders();
-  
+
   const config = {
     ...options,
     headers: {
@@ -98,10 +92,10 @@ export const authenticatedFetch = async (url, options = {}) => {
       ...options.headers,
     },
   };
-  
+
   console.log('🔐 Making authenticated request to:', url);
   console.log('🔑 With headers:', authHeaders);
-  
+
   return fetch(url, config);
 };
 

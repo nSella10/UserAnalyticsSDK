@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // אתחול ה-SDK עם URL השרת וה-API Key שלך
-        AnalyticsTracker.init("${process.env.REACT_APP_API_URL || 'http://localhost:8080'}/", "${app.apiKey}");
+        AnalyticsTracker.init("https://user-analytics-backend-env.eba-kc7wz3xt.eu-north-1.elasticbeanstalk.com/", "${app.apiKey}");
 
         // דוגמה לשליחת אירוע
         Map<String, Object> properties = new HashMap<>();

@@ -35,10 +35,12 @@ public class HealthController {
         response.put("timestamp", LocalDateTime.now().toString());
         response.put("endpoints", new String[] {
                 "/health - Health check",
-                "/api/auth/register - User registration",
-                "/api/auth/login - User login",
-                "/api/track - Track user actions",
-                "/api/screen-time - Track screen time"
+                "/developers/register - Developer registration",
+                "/developers/login - Developer login",
+                "/track - Track user actions",
+                "/screen-time - Track screen time",
+                "/apps/create - Create application",
+                "/apps/my-apps - Get developer apps"
         });
 
         return ResponseEntity.ok(response);
