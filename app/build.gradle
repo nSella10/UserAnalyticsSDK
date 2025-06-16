@@ -39,7 +39,14 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 
-    implementation project(":analyticstracker")
+
+    // 📦 ספריית האנליטיקה המקומית
+    //implementation project(':analyticstracker')
+
+
+    // jitpack
+    implementation libs.useranalyticsSdk
+
 
     // Retrofit
     implementation libs.retrofit
