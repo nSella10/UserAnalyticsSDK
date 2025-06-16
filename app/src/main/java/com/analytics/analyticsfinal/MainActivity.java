@@ -42,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize the AnalyticsTracker with default configuration
         // כל ההגדרות נמצאות בקובץ TrackerConfig
         Log.d("MainActivity", "🔗 Initializing AnalyticsTracker with default configuration");
-        AnalyticsTracker.initWithDefaults();
+        AnalyticsTracker.init(BuildConfig.ANALYTICS_BASE_URL, BuildConfig.ANALYTICS_API_KEY);
+
 
         categoryRecycler = findViewById(R.id.categoryRecycler);
         categoryRecycler.setLayoutManager(new GridLayoutManager(this, 2));

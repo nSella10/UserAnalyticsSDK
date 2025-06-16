@@ -16,6 +16,7 @@ import com.analytics.analyticstracker.model.LoginRequest;
 import com.analytics.analyticsfinal.utils.TokenManager;
 import com.analytics.analyticstracker.AnalyticsTracker;
 import com.analytics.analyticstracker.model.User;
+import com.analytics.analyticsfinal.BuildConfig;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,7 +47,7 @@ public class AuthActivity extends AppCompatActivity {
         setContentView(R.layout.activity_auth);
 
         // אתחול AnalyticsTracker עם הגדרות ברירת מחדל
-        AnalyticsTracker.initWithDefaults();
+        AnalyticsTracker.init(BuildConfig.ANALYTICS_BASE_URL, BuildConfig.ANALYTICS_API_KEY);
         Log.d("AuthActivity", "🔧 AnalyticsTracker initialized with default config");
 
         initViews();
