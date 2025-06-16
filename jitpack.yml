@@ -1,5 +1,4 @@
 jdk:
   - openjdk17
 install:
-  - cd analyticstracker
-  - ./gradlew publishToMavenLocal
+  - ./gradlew :analyticstracker:publishToMavenLocal
