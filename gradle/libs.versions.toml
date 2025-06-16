@@ -10,7 +10,7 @@ material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
 identityJvm = "202411.1"
-userAnalyticsSdk = "000773cabd"
+userAnalyticsSdk = "56c79d8"
 
 [libraries]
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
