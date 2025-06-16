@@ -23,12 +23,11 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-//import com.analytics.analyticstracker.config.TrackerConfig;
+import com.analytics.analyticstracker.config.TrackerConfig;
 
 public class AnalyticsTracker {
 
-    //private static String BASE_URL = TrackerConfig.BASE_URL; // Default base URL from config
-    private static String BASE_URL = null;
+    private static String BASE_URL = TrackerConfig.BASE_URL; // Default base URL from config
 
     private static String API_KEY = null; // API Key של האפליקציה
 
@@ -49,12 +48,12 @@ public class AnalyticsTracker {
     }
 
     // אתחול עם ברירת מחדל מלאה (לבדיקות מהירות)
-//    public static void initWithDefaults() {
-//        BASE_URL = TrackerConfig.BASE_URL;
-//        API_KEY = TrackerConfig.DEFAULT_API_KEY;
-//        Log.d("AnalyticsTracker",
-//                "🔗 Initialized with all defaults - BASE_URL: " + BASE_URL + " and API_KEY: " + API_KEY);
-//    }
+    public static void initWithDefaults() {
+        BASE_URL = TrackerConfig.BASE_URL;
+        API_KEY = TrackerConfig.DEFAULT_API_KEY;
+        Log.d("AnalyticsTracker",
+                "🔗 Initialized with all defaults - BASE_URL: " + BASE_URL + " and API_KEY: " + API_KEY);
+    }
 
     // שליחת פעולה (event) לשרת
     public static void trackEvent(String userId, String actionName, Map<String, Object> properties) {
