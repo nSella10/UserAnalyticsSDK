@@ -40,12 +40,11 @@ dependencies {
     androidTestImplementation libs.espresso.core
 
 
-    // 📦 ספריית האנליטיקה המקומית
-    //implementation project(':analyticstracker')
+
 
 
     // jitpack
-    implementation libs.useranalyticsSdk
+    implementation 'com.github.nSella10:UserAnalyticsSDK:42bf1f02'
 
 
     // Retrofit
