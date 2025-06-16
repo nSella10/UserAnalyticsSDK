@@ -90,9 +90,9 @@
 
 plugins {
     id 'com.android.library'
+    id 'maven-publish'
 }
 
-apply plugin: 'maven-publish' // 👈 חובה לפרסום ב־JitPack
 
 android {
     namespace 'com.analytics.analyticstracker'
@@ -115,6 +115,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+
+    }
 }
 
 dependencies {
@@ -130,12 +136,5 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-            }
-        }
-    }
-}
+
+
