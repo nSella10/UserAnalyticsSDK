@@ -93,13 +93,13 @@ plugins {
     id 'maven-publish'
 }
 
-
 android {
     namespace 'com.analytics.analyticstracker'
     compileSdk 35
 
     defaultConfig {
         minSdk 26
+        targetSdk 35
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -115,26 +115,68 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
     publishing {
         singleVariant("release") {
             withSourcesJar()
+            withJavadocJar()
         }
-
     }
 }
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-
-    // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
+
+afterEvaluate {
+    publishing {
+        publications {
+            register("release", MavenPublication) {
+                groupId = "com.github.nSella10"
+                artifactId = "UserAnalyticsSDK"
+                version = "1.0.0"
+                from components.release
+
+                pom {
+                    name = "User Analytics SDK"
+                    description = "SDK for tracking screen time and user actions"
+                    url = "https://github.com/nSella10/UserAnalyticsSDK"
+
+                    licenses {
+                        license {
+                            name = "MIT License"
+                            url = "https://opensource.org/licenses/MIT"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = "nSella10"
+                            name = "Noam Sella"
+                        }
+                    }
+
+                    scm {
+                        connection = "scm:git:git://github.com/nSella10/UserAnalyticsSDK.git"
+                        developerConnection = "scm:git:ssh://github.com/nSella10/UserAnalyticsSDK.git"
+                        url = "https://github.com/nSella10/UserAnalyticsSDK"
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
 
 
 
