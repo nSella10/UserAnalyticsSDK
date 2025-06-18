@@ -2,7 +2,6 @@ package com.analytics.user_analytics.controller;
 
 import com.analytics.user_analytics.model.User;
 import com.analytics.user_analytics.model.UserAction;
-import com.analytics.user_analytics.model.Developer;
 import com.analytics.user_analytics.repository.UserActionRepository;
 import com.analytics.user_analytics.repository.UserRepository;
 
@@ -186,53 +185,6 @@ public class UserActionController {
         }        
 
 
-        // @GetMapping("/stats/by-subcategory")
-        // public Object getClicksBySubcategory(
-        //                 @RequestParam String category,
-        //                 @RequestParam(required = false) String fromDate,
-        //                 @RequestParam(required = false) String toDate,
-        //                 @RequestParam(required = false) List<String> userIds,
-        //                 @RequestParam(required = false) String apiKey) {
-
-        //         boolean hasUserFilter = userIds != null && !userIds.isEmpty();
-
-        //         if (!hasUserFilter) {
-        //                 // החזר מבנה פשוט אם אין יוזרים מסוננים
-        //                 return repository.findAll().stream()
-        //                                 .filter(action -> "click_subcategory".equals(action.getActionName()) &&
-        //                                                 action.getProperties() != null &&
-        //                                                 category.equals(action.getProperties().get("category")) &&
-        //                                                 action.getProperties().containsKey("subcategory") &&
-        //                                                 isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
-        //                                                 (apiKey == null || apiKey.equals(action.getApiKey())))
-        //                                 .collect(Collectors.groupingBy(
-        //                                                 action -> action.getProperties().get("subcategory").toString(),
-        //                                                 Collectors.counting()));
-        //         }
-
-        //         // אם כן יש יוזרים מסוננים — מחזיר רשימה של אובייקטים עם שדות
-        //         return repository.findAll().stream()
-        //                         .filter(action -> "click_subcategory".equals(action.getActionName()) &&
-        //                                         action.getProperties() != null &&
-        //                                         category.equals(action.getProperties().get("category")) &&
-        //                                         action.getProperties().containsKey("subcategory") &&
-        //                                         isInDateRangeFixed(action.getTimestamp(), fromDate, toDate) &&
-        //                                         userIds.contains(action.getUserId()) &&
-        //                                         (apiKey == null || apiKey.equals(action.getApiKey())))
-        //                         .collect(Collectors.groupingBy(
-        //                                         action -> Map.of(
-        //                                                         "subcategory",
-        //                                                         action.getProperties().get("subcategory").toString(),
-        //                                                         "userId", action.getUserId()),
-        //                                         Collectors.counting()))
-        //                         .entrySet().stream()
-        //                         .map(entry -> {
-        //                                 Map<String, Object> result = new HashMap<>(entry.getKey());
-        //                                 result.put("count", entry.getValue());
-        //                                 return result;
-        //                         })
-        //                         .collect(Collectors.toList());
-        // }
 
         @GetMapping("/stats/by-item")
         public Object getClicksByItem(
@@ -288,38 +240,6 @@ public class UserActionController {
                                 .collect(Collectors.toList());
         }
 
-        private boolean isInDateRange(LocalDateTime timestamp, String fromDate, String toDate) {
-                if (fromDate == null || toDate == null)
-                        return true;
-                // LocalDateTime from = LocalDateTime.parse(fromDate);
-                // LocalDateTime to = LocalDateTime.parse(toDate);
-                // return !timestamp.isBefore(from) && !timestamp.isAfter(to);
-                try {
-                        // ניקוי פורמט: הסרת Z או +00:00 אם קיימים
-                        String cleanFrom = fromDate.replace("Z", "").replace("+00:00", "");
-                        String cleanTo = toDate.replace("Z", "").replace("+00:00", "");
-
-                        LocalDateTime from, to;
-
-                        if (cleanFrom.contains("T")) {
-                                from = LocalDateTime.parse(cleanFrom);
-                        } else {
-                                from = LocalDateTime.parse(cleanFrom + "T00:00:00");
-                        }
-
-                        if (cleanTo.contains("T")) {
-                                to = LocalDateTime.parse(cleanTo);
-                        } else {
-                                to = LocalDateTime.parse(cleanTo + "T23:59:59");
-                        }
-
-                        return (!timestamp.isBefore(from)) && (!timestamp.isAfter(to));
-
-                } catch (Exception e) {
-                        System.err.println("Error parsing date range: " + e.getMessage());
-                        return true;
-                }
-        }
 
         @GetMapping("/stats/by-category-stacked")
         public List<Map<String, Object>> getCategoryCountsByUser(
