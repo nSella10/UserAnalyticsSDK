@@ -3,6 +3,12 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+def localProps = new Properties()
+def localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localProps.load(new FileInputStream(localPropsFile))
+}
+
 android {
     namespace 'com.analytics.analyticsfinal'
     compileSdk 35
@@ -17,8 +23,8 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // 💡 קונפיגורציית הסודות
-        buildConfigField "String", "ANALYTICS_BASE_URL", "\"${project.properties['ANALYTICS_BASE_URL']}\""
-        buildConfigField "String", "ANALYTICS_API_KEY", "\"${project.properties['ANALYTICS_API_KEY']}\""
+        buildConfigField "String", "ANALYTICS_BASE_URL", "\"${localProps['ANALYTICS_BASE_URL']}\""
+        buildConfigField "String", "ANALYTICS_API_KEY", "\"${localProps['ANALYTICS_API_KEY']}\""
     }
 
     buildFeatures {
@@ -53,7 +59,7 @@ dependencies {
 
 
     // jitpack
-    implementation 'com.github.nSella10:UserAnalyticsSDK:v1.0.0'
+    implementation 'com.github.nSella10:UserAnalyticsSDK:v1.0.3'
 
 
     // Retrofit

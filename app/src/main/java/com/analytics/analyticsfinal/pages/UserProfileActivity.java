@@ -1,22 +1,19 @@
 package com.analytics.analyticsfinal.pages;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
+
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+
 import android.widget.*;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.analytics.analyticsfinal.R;
-import com.analytics.analyticsfinal.pages.AuthActivity;
-import com.analytics.analyticsfinal.utils.TokenManager;
+
 import com.analytics.analyticsfinal.utils.UserManager;
 import com.analytics.analyticstracker.AnalyticsTracker;
 

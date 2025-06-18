@@ -26,8 +26,6 @@ import retrofit2.Response;
 
 public class AnalyticsTracker {
 
-    // private static String BASE_URL = TrackerConfig.BASE_URL; // Default base URL from config
-
     private static String BASE_URL = null;
     private static String API_KEY = null; // API Key של האפליקציה
 
@@ -47,13 +45,6 @@ public class AnalyticsTracker {
         Log.d("AnalyticsTracker", "🔗 Initialized with default BASE_URL: " + BASE_URL + " and API_KEY: " + apiKey);
     }
 
-    // אתחול עם ברירת מחדל מלאה (לבדיקות מהירות)
-//    public static void initWithDefaults() {
-//        BASE_URL = TrackerConfig.BASE_URL;
-//        API_KEY = TrackerConfig.DEFAULT_API_KEY;
-//        Log.d("AnalyticsTracker",
-//                "🔗 Initialized with all defaults - BASE_URL: " + BASE_URL + " and API_KEY: " + API_KEY);
-//    }
 
     // שליחת פעולה (event) לשרת
     public static void trackEvent(String userId, String actionName, Map<String, Object> properties) {

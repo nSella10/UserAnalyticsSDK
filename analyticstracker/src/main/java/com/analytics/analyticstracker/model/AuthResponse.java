@@ -1,6 +1,5 @@
 package com.analytics.analyticstracker.model;
 
-import com.analytics.analyticstracker.model.User;
 
 public class AuthResponse {
     private String token;
