@@ -214,56 +214,9 @@ Reference in `AndroidManifest.xml`:
     android:networkSecurityConfig="@xml/network_security_config">
 ```
 
-### Certificate Pinning (Advanced)
 
-For high-security applications:
 
-```java
-// Custom OkHttp client with certificate pinning
-OkHttpClient client = new OkHttpClient.Builder()
-    .certificatePinner(new CertificatePinner.Builder()
-        .add("d1xb34m3k0zeus.cloudfront.net", "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
-        .build())
-    .build();
-```
 
-## 🔐 Authentication Security
-
-### JWT Token Handling
-
-If using user authentication features:
-
-```java
-public class TokenManager {
-    private static final String TOKEN_KEY = "auth_token";
-    
-    public static void saveToken(Context context, String token) {
-        // Use encrypted shared preferences for tokens
-        EncryptedSharedPreferences prefs = EncryptedSharedPreferences.create(
-            "secure_prefs",
-            MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
-            context,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        );
-        
-        prefs.edit().putString(TOKEN_KEY, token).apply();
-    }
-    
-    public static String getToken(Context context) {
-        // Retrieve from encrypted storage
-        EncryptedSharedPreferences prefs = EncryptedSharedPreferences.create(
-            "secure_prefs",
-            MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
-            context,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        );
-        
-        return prefs.getString(TOKEN_KEY, null);
-    }
-}
-```
 
 ## 🚨 Security Incident Response
 
@@ -312,53 +265,7 @@ Protect your code with obfuscation:
 -packageobfuscationdictionary dictionary.txt
 ```
 
-### Root Detection
 
-For sensitive apps, consider root detection:
-
-```java
-public class SecurityUtils {
-    public static boolean isDeviceRooted() {
-        // Check for common root indicators
-        String[] rootPaths = {
-            "/system/app/Superuser.apk",
-            "/sbin/su",
-            "/system/bin/su",
-            "/system/xbin/su"
-        };
-        
-        for (String path : rootPaths) {
-            if (new File(path).exists()) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-}
-
-// Usage
-if (SecurityUtils.isDeviceRooted()) {
-    // Handle rooted device appropriately
-    Log.w("Security", "Rooted device detected");
-}
-```
-
-### Debug Detection
-
-Prevent debugging in production:
-
-```java
-public class DebugDetection {
-    public static boolean isDebuggingEnabled(Context context) {
-        return (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-    }
-    
-    public static boolean isDebuggerAttached() {
-        return Debug.isDebuggerConnected() || Debug.waitingForDebugger();
-    }
-}
-```
 
 ## 🔍 Security Audit Checklist
 
@@ -383,29 +290,14 @@ public class DebugDetection {
 - [ ] Update dependencies regularly
 - [ ] Review user permissions
 
-## 📚 Compliance Considerations
+## 📚 Privacy Compliance
 
-### GDPR Compliance
+### Key Privacy Principles
 
-- Implement user consent mechanisms
-- Provide data deletion capabilities
-- Maintain data processing records
-- Ensure data minimization
-- Implement privacy by design
-
-### CCPA Compliance
-
-- Provide opt-out mechanisms
-- Disclose data collection practices
-- Honor user data requests
-- Maintain data inventory
-
-### Children's Privacy (COPPA)
-
-- Implement age verification if applicable
-- Get parental consent for users under 13
-- Limit data collection for children
-- Provide parental controls
+- **User Consent:** Always get user permission before tracking
+- **Data Minimization:** Only collect necessary analytics data
+- **Transparency:** Clearly explain what data you collect
+- **User Control:** Allow users to opt-out of tracking
 
 ## 📞 Security Support
 
