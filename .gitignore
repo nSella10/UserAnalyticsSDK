@@ -10,6 +10,10 @@ local.properties
 *.secret
 config.properties
 
+# Temporary files
+.tmp/
+*.tmp
+
 
 
 # === Node / React (frontend) ===
