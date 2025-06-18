@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
 - **[API Reference](docs/api-reference.md)** - Complete method documentation
 - **[Examples](docs/examples.md)** - Code examples and use cases
 - **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
-- **[Security Guide](docs/security.md)** - Best practices for API key management
 
 ## 🏗️ Architecture
 
