@@ -2,8 +2,13 @@
 # קבצים עם מידע רגיש - אסור שיהיו ב-Git!
 # יש ליצור את הקבצים האלה מקומית לפי ההוראות ב-README
 analyticstracker/src/main/java/com/analytics/analyticstracker/config/TrackerConfig.java
-backend/src/main/resources/application.properties
+backend/src/main/resources/application-local.properties
 local.properties
+
+# API Keys and secrets
+*.key
+*.secret
+config.properties
 
 
 

@@ -59,7 +59,7 @@ dependencies {
 
 
     // jitpack
-    implementation 'com.github.nSella10:UserAnalyticsSDK:v1.0.3'
+    implementation 'com.github.nSella10:UserAnalyticsSDK:v1.0.6'
 
 
     // Retrofit
